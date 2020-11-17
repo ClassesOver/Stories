@@ -7,7 +7,7 @@ cli.register(app)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return app.send_static_file('index.html')
 
 @app.shell_context_processor
 def make_shell_context():
