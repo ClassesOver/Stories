@@ -1,0 +1,329 @@
+@font-face {
+	font-family: 'Fira Mono';
+	font-style: normal;
+	font-weight: normal;
+	src: local("Fira Mono Regular"), url("./fonts/FiraMono-Regular.ttf") format("truetype");
+}
+@font-face {
+	font-family: 'Fira Mono';
+	font-style: normal;
+	font-weight: bold;
+	src: local("Fira Mono Bold"), url("./fonts/FiraMono-Bold.ttf") format("truetype");
+}
+@media (max-width: 767px) {
+	.markdown-body {
+		padding: 15px;
+	}
+}
+.markdown-body {
+	box-sizing: border-box;
+	min-width: 200px;
+	max-width: 860px;
+	margin: 0 auto;
+	padding: 10px;
+	--primary-color: #fcba03;
+	--primary-color-rgb: 252, 186, 3;
+	--bg-color: #292929;
+	--bg-color-dark: #1f1f1f;
+	--dark-trait: #141414;
+	--light-trait-100: #3d3d3d;
+	--light-trait-200: #545454;
+	--light-trait-300: #777;
+	--light-trait-400: #8c8c8c;
+	--light-trait-500: #e8e6d8;
+	--text-color: #f8f8f2;
+	--text-color-secondary: #d2d3d3;
+	--text-highlight-color: #fff;
+	--text-highlight-bg: rgba(var(--primary-color-rgb), 0.3);
+	--select-text-bg-color: rgba(255, 255, 255, 0.2);
+	--search-select-text-color: var(--text-highlight-color);
+	--search-select-bg-color: var(--text-highlight-bg);
+	--code-color: #e6a5a5;
+	--border-radius: 3px;
+	--font-size: 14px;
+	--font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
+	--monospace: 'Fira Mono', 'Cousine', 'Consolas', monospace;
+	--heading-char-color: var(--light-trait-400);
+	--color-popover-bg-color: var(--text-color);
+	--rawblock-edit-panel-bd: var(--bg-color-dark);
+	--control-text-color: var(--text-color);
+	--meta-content-color: var(--primary-color);
+	--primary-btn-border-color: var(--primary-color);
+	--side-bar-bg-color: var(--bg-color-dark);
+	--item-hover-bg-color: var(--bg-color);
+	--active-file-bg-color: var(--bg-color);
+	--active-file-border-color: var(--bg-color);
+	--window-border: 1px solid var(--bg-color);
+	--focus-ring-color: transparent;
+	font-size: var(--font-size);
+	font-family: var(--font-family);
+	-webkit-font-smoothing: antialiased;
+	color: var(--text-color);
+	line-height: 1.6;
+	max-width: 860px;
+	h1, h2, h3, h4, h5, h6 {
+		color: var(--text-color) !important;
+	}
+	code {
+		color: #e6a5a5;
+		.react-syntax-highlighter-line-number {
+			color: white;
+		}
+	}
+	h1 {
+		width: 100%;
+	}
+	a {
+		color: var(--primary-color);
+	}
+	h1 {
+		position: relative;
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+		font-weight: bold;
+		line-height: 1.4;
+		cursor: text;
+		padding-bottom: 0.3em;
+		font-size: 2.2em;
+		line-height: 1.3;
+		border-bottom: 1px solid var(--light-trait-500);
+		&:hover {
+			a.anchor {
+				text-decoration: none;
+			}
+		}
+		tt {
+			font-size: inherit;
+		}
+		code {
+			font-size: inherit;
+		}
+	}
+	h2 {
+		position: relative;
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+		font-weight: bold;
+		line-height: 1.4;
+		cursor: text;
+		padding-bottom: 0.3em;
+		font-size: 1.75em;
+		line-height: 1.225;
+		border-bottom: 1px solid var(--light-trait-500);
+		&:hover {
+			a.anchor {
+				text-decoration: none;
+			}
+		}
+		tt {
+			font-size: inherit;
+		}
+		code {
+			font-size: inherit;
+		}
+	}
+	h3 {
+		position: relative;
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+		font-weight: bold;
+		line-height: 1.4;
+		cursor: text;
+		font-size: 1.4em;
+		line-height: 1.43;
+		&:hover {
+			a.anchor {
+				text-decoration: none;
+			}
+		}
+		tt {
+			font-size: inherit;
+		}
+		code {
+			font-size: inherit;
+		}
+	}
+	h4 {
+		position: relative;
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+		font-weight: bold;
+		line-height: 1.4;
+		cursor: text;
+		font-size: 1.2em;
+		&:hover {
+			a.anchor {
+				text-decoration: none;
+			}
+		}
+		tt {
+			font-size: inherit;
+		}
+		code {
+			font-size: inherit;
+		}
+	}
+	h5 {
+		position: relative;
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+		font-weight: bold;
+		line-height: 1.4;
+		cursor: text;
+		font-size: 1em;
+		&:hover {
+			a.anchor {
+				text-decoration: none;
+			}
+		}
+		tt {
+			font-size: inherit;
+		}
+		code {
+			font-size: inherit;
+		}
+	}
+	h6 {
+		position: relative;
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+		font-weight: bold;
+		line-height: 1.4;
+		cursor: text;
+		font-size: 1em;
+		color: var(--light-trait-300);
+		&:hover {
+			a.anchor {
+				text-decoration: none;
+			}
+		}
+		tt {
+			font-size: inherit;
+		}
+		code {
+			font-size: inherit;
+		}
+	}
+	p {
+		margin: 0.8em 0;
+	}
+	blockquote {
+		margin: 0.8em 0;
+		margin-left: -14px;
+		margin-right: -14px;
+		border-radius: var(--border-radius);
+		border-left: 4px solid var(--light-trait-300);
+		background-color: var(--light-trait-100);
+		padding: 7px 14px 7px 10px;
+		blockquote {
+			padding-right: 0;
+		}
+	}
+	ul {
+		margin: 0.8em 0;
+		padding-left: 30px;
+		&:first-child {
+			margin-top: 0;
+		}
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+	ol {
+		margin: 0.8em 0;
+		padding-left: 30px;
+		&:first-child {
+			margin-top: 0;
+		}
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+	dl {
+		margin: 0.8em 0;
+	}
+	table {
+		margin: 0.8em 0;
+		padding: 0;
+		word-break: initial;
+		tr {
+			border-top: 1px solid var(--dark-trait);
+			margin: 0;
+			padding: 0;
+			&:nth-child(2n) {
+				background-color: var(--side-bar-bg-color);
+			}
+			th {
+				font-weight: bold;
+				border: 1px solid var(--dark-trait);
+				border-bottom: 0;
+				margin: 0;
+				padding: 6px 13px;
+				&:first-child {
+					margin-top: 0;
+				}
+				&:last-child {
+					margin-bottom: 0;
+				}
+			}
+			td {
+				border: 1px solid var(--dark-trait);
+				margin: 0;
+				padding: 6px 13px;
+				&:first-child {
+					margin-top: 0;
+				}
+				&:last-child {
+					margin-bottom: 0;
+				}
+			}
+		}
+	}
+	li {
+		>ol {
+			margin: 0 0;
+		}
+		>ul {
+			margin: 0 0;
+		}
+		p.first {
+			display: inline-block;
+		}
+	}
+	hr {
+		height: 2px;
+		padding: 0;
+		margin: 16px 0;
+		background-color: var(--light-trait-100);
+		border: 0 none;
+		overflow: hidden;
+		box-sizing: content-box;
+	}
+	sup.md-footnote {
+		background-color: var(--light-trait-400);
+		color: var(--light-trait-100);
+	}
+	mark {
+		background: var(--search-select-bg-color);
+		color: var(--search-select-text-color);
+	}
+	
+	thead {
+		background-color: var(--side-bar-bg-color);
+	}
+	kbd {
+		font-size: 0.875rem;
+		background: var(--bg-color-dark);
+		border: 1px solid var(--dark-trait);
+		box-shadow: 0 2px 0 var(--dark-trait);
+		color: var(--text-color-secondary);
+	}
+	tt {
+		border: 1px solid var(--dark-trait);
+		background-color: var(--bg-color-dark);
+		border-radius: var(--border-radius);
+		padding: 2px 4px 0px 4px;
+		font-size: 0.9em;
+		font-family: var(--monospace);
+	}
+}
