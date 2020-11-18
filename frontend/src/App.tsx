@@ -12,7 +12,7 @@ import PrivateRoute from "./route";
 import { ThemeProvider } from '@material-ui/styles';
 import { setBlockUiCallback } from "./blocking";
 import {
-    BrowserRouter as Router,
+    HashRouter as Router,
     Switch,
     Redirect,
     Route,
