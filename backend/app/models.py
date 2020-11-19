@@ -283,16 +283,18 @@ class Post(SearchableMixin, db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), default=_default_user)
     published = db.Column(db.Boolean(), default=False)
     clap_count = db.Column(db.Integer, default=0)
+
+    def add_to_index(index, model):
+        if model.published:
+            return super(Post, self).__init__(index, model)
     
     def action_publish(self):
         self.published = True
+        self.add_to_index(type(self).__tablename__, self)
     
     def action_draft(self):
         self.published = False
-    
-    def __init__(self, title, body):
-        self.title = title
-        self.body = body
+        self.remove_from_index(type(self).__tablename__, self)
     
     def __repr__(self):
         return '<Post {}>'.format(self.title)

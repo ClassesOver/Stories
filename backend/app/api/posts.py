@@ -18,7 +18,7 @@ def search_posts():
     if value:
         query, total = Post.search(value, page=page, per_page=per_page)
         data = {
-            'items'   : [post       .to_dict() for post in query.all()],
+            'items'   : [post.to_dict() for post in query.all()],
             'total'   : total,
             'page'    : page,
             'per_page': per_page,
@@ -108,7 +108,7 @@ def get_published_posts():
 def create_post():
     body = request.json.get('body')
     title = request.json.get('title')
-    post = Post(title, body)
+    post = Post(title=title, body=body)
     db.session.add(post)
     db.session.commit()
     return jsonify(post.hash_id)

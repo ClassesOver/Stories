@@ -13,9 +13,7 @@ const Search: React.FC<Props> = (props) => {
         setValue(value);
     };
     useEffect(() => {
-        if (value) {
-            history.push(`/expore/search?value=${value}`);
-        }
+        history.push(`/expore/search?value=${value}`);
     },[value]);
     return  (<div className={`search-box-container ${props.className}`}>
     <div className="search-box">

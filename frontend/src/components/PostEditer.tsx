@@ -21,8 +21,12 @@ interface IPostEditorViewProps {
 }
 interface IPostEditorHeaderProps {
     disabled?: boolean;
+    mode: string;
     title: string;
+    published: boolean;
     onSave: React.MouseEventHandler;
+    onDraft: React.MouseEventHandler;
+    onPublish: React.MouseEventHandler;
 }
 
 const PostEditor : React.FC<IPostEditorProps> = (props) => {
@@ -57,7 +61,8 @@ const PostEditor : React.FC<IPostEditorProps> = (props) => {
 const PostEditorHeader : React.FC<IPostEditorHeaderProps>  = (props) => {
     return ( <div className="tm-post-editor-header">
         <div id="title"><Markdown>{props.title || ''}</Markdown></div>
-        <Button variant="contained" color="secondary" onClick={props.onSave} disabled={props.disabled || false} >Save</Button>
+        {props.mode == 'write' ? props.published ? <Button variant="contained" color="primary" onClick={props.onDraft} >Draft</Button> : <Button variant="contained" color="primary" onClick={props.onPublish} >Publish</Button> : ''}
+        <Button variant="contained" color="secondary" onClick={props.onSave} disabled={props.disabled} >Save</Button>
     </div>)
 }
 interface IState {
@@ -65,30 +70,35 @@ interface IState {
     id: string | number;
     mode: string;
     title: string;
+    published: boolean;
 }
 const PostEditorView : React.FC<IPostEditorViewProps> = (props) => {
-    const [post, setPost] = useState<IState>({body: '', title: '', id: 'new', mode: 'create'});
+    const [post, setPost] = useState<IState>({body: '', title: '', id: 'new', mode: 'create', published: false});
     const [disabled,setDisabled] = useState(true);
-    const [saveCount, setSaveCount] = useState(0);
-    const [saveValue, setSaveValue] = useState('');
+    const [values, setValues] = useState<any []>([]);
     const {authenticated} = useContext(AppContext);
     const history = useHistory();
+
     const onSave = (event: React.MouseEvent) => {
         if (postId === 'new') {
             createPost(post.body, post.title).then(id => {
-                history.push(`/expore/editor/${id}`)
+                history.push(`/expore/editor/${id}`);
             });
         } else {
             savePost(postId, post.body, post.title).then(() => {
-                let count = saveCount + 1;
-                setSaveCount(count);
+                fetchPost(postId);
             });
         }
     }
+    const onPublish = (event: React.MouseEvent) => {
 
+    }
+    const onDraft = (event: React.MouseEvent) => {
+
+    }
     let regexHeader = /^# (.*$)/igm;
     const onChange = (value: any) => {
-        setDisabled((value == saveValue));
+        setDisabled(value == values.slice(-1));
         let header;
         if (value) {
             let headers = value.match(regexHeader);
@@ -102,36 +112,36 @@ const PostEditorView : React.FC<IPostEditorViewProps> = (props) => {
         return setPost({...post, body: value, title: header});
     }
     let { postId } = useParams<IParams>();
-
     const fetchPost = async (postId: string) => {
         if (postId === 'new') {
-            setPost({...post, id: 'new', body: '', mode: 'create'})
-            setSaveValue('')
+            setPost({...post, id: 'new', body: '', mode: 'create', published: false})
+            values.push('');
+            setValues(values);
         } else {
             let resp = await api.getPost(postId);
+            setDisabled(true);
             let {id, body, title, author} = resp.data as any;
+            values.push(body);
+            setValues(values);
             if (id && author.id !== authenticated.userId) {
                 history.push('/expore', {errorCode: 401});
                 return;
             }
-            setSaveValue(body);
             if (body == post.body && title == post.title) {
                 return;
             }
             setPost({...post, id: id , body: body ,mode: 'write'})
         }
     }
-    useEffect(() => {
-        fetchPost(postId)
-    }, [saveCount])
+
     
     useEffect(() => {
         fetchPost(postId)
-    }, []);
+    }, [props]);
     
     return (
         <>
-        <PostEditorHeader title={post.title} disabled={disabled}  onSave={onSave}/>
+        <PostEditorHeader published={post.published} mode={post.mode} title={post.title} disabled={disabled}  onDraft={onDraft} onPublish={onPublish} onSave={onSave}/>
         <PostEditor body={post.body} onChange={onChange} />
         </>
      )
