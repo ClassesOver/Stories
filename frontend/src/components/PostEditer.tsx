@@ -8,6 +8,7 @@ import * as api from "../api";
 import Button from '@material-ui/core/Button';
 import Markdown from 'markdown-to-jsx';
 import AppContext from '../context';
+import {useToasts } from 'react-toast-notifications';
 
 interface IPostEditorProps {
     body: string;
@@ -59,6 +60,7 @@ const PostEditor : React.FC<IPostEditorProps> = (props) => {
 }
 
 const PostEditorHeader : React.FC<IPostEditorHeaderProps>  = (props) => {
+    console.log(props);
     return ( <div className="tm-post-editor-header">
         <div id="title"><Markdown>{props.title || ''}</Markdown></div>
         {props.mode == 'write' ? props.published ? <Button variant="contained" color="primary" onClick={props.onDraft} >Draft</Button> : <Button variant="contained" color="primary" onClick={props.onPublish} >Publish</Button> : ''}
@@ -68,16 +70,17 @@ const PostEditorHeader : React.FC<IPostEditorHeaderProps>  = (props) => {
 interface IState {
     body: string;
     id: string | number;
-    mode: string;
     title: string;
     published: boolean;
 }
 const PostEditorView : React.FC<IPostEditorViewProps> = (props) => {
-    const [post, setPost] = useState<IState>({body: '', title: '', id: 'new', mode: 'create', published: false});
+    const [post, setPost] = useState<IState>({body: '', title: '', id: 'new', published: false});
     const [disabled,setDisabled] = useState(true);
     const [values, setValues] = useState<any []>([]);
     const {authenticated} = useContext(AppContext);
+    const [mode, setMode] = useState('');
     const history = useHistory();
+    const { addToast } = useToasts();
 
     const onSave = (event: React.MouseEvent) => {
         if (postId === 'new') {
@@ -90,11 +93,21 @@ const PostEditorView : React.FC<IPostEditorViewProps> = (props) => {
             });
         }
     }
-    const onPublish = (event: React.MouseEvent) => {
-
+    const onPublish = async (event: React.MouseEvent) => {
+        await api.publishPost(postId);
+        setPost({...post, published: true});
+        addToast(`${post.title} is published.`, {
+            appearance: 'info',
+            autoDismiss: true,
+        })
     }
-    const onDraft = (event: React.MouseEvent) => {
-
+    const onDraft = async (event: React.MouseEvent) => {
+        await api.draftPost(postId);
+        setPost({...post, published: false});
+        addToast(`${post.title} is drafted.`, {
+            appearance: 'info',
+            autoDismiss: true,
+        })
     }
     let regexHeader = /^# (.*$)/igm;
     const onChange = (value: any) => {
@@ -114,23 +127,22 @@ const PostEditorView : React.FC<IPostEditorViewProps> = (props) => {
     let { postId } = useParams<IParams>();
     const fetchPost = async (postId: string) => {
         if (postId === 'new') {
-            setPost({...post, id: 'new', body: '', mode: 'create', published: false})
+            setPost({...post, id: 'new', body: '', published: false})
             values.push('');
             setValues(values);
+            setMode('create');
         } else {
             let resp = await api.getPost(postId);
             setDisabled(true);
-            let {id, body, title, author} = resp.data as any;
+            let {id, body, title, author, published} = resp.data as any;
             values.push(body);
             setValues(values);
             if (id && author.id !== authenticated.userId) {
                 history.push('/expore', {errorCode: 401});
                 return;
             }
-            if (body == post.body && title == post.title) {
-                return;
-            }
-            setPost({...post, id: id , body: body ,mode: 'write'})
+            setPost({...post, id: id , body: body, title , published})
+            setMode('write');
         }
     }
 
@@ -141,7 +153,7 @@ const PostEditorView : React.FC<IPostEditorViewProps> = (props) => {
     
     return (
         <>
-        <PostEditorHeader published={post.published} mode={post.mode} title={post.title} disabled={disabled}  onDraft={onDraft} onPublish={onPublish} onSave={onSave}/>
+        <PostEditorHeader published={post.published} mode={mode} title={post.title} disabled={disabled}  onDraft={onDraft} onPublish={onPublish} onSave={onSave}/>
         <PostEditor body={post.body} onChange={onChange} />
         </>
      )

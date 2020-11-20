@@ -250,6 +250,9 @@ $primary-color: #612c2c;
   align-items: center;
   padding: 2px 10px;
   position: relative;
+  button {
+      margin: 0px 5px;
+  }
   #title {
     position: absolute;
     left: 0px;

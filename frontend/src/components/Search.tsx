@@ -11,10 +11,8 @@ const Search: React.FC<Props> = (props) => {
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.value;
         setValue(value);
-    };
-    useEffect(() => {
         history.push(`/expore/search?value=${value}`);
-    },[value]);
+    };
     return  (<div className={`search-box-container ${props.className}`}>
     <div className="search-box">
         <a href="#" className="search-btn">

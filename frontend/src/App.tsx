@@ -125,7 +125,7 @@ export const PopMessage: React.FC<IPopMessageProps> = (props) => {
             addToast(props.message, {
                 appearance: 'error',
                 autoDismiss: true,
-            })
+            });
         }
     }, [props.message])
     return <></>

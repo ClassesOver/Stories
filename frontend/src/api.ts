@@ -164,3 +164,12 @@ export const getComments = (data: { [key: string]: any }) => {
 export const searchPost = (data: {[key: string]: any}) => {
     return get(`/api/posts/search?value=${data.value}&page=${data.page}&per_page${data.per_page}`);
 }
+
+export const publishPost = (id: string) => {
+    return put(`/api/posts/${id}/publish`, {});
+}
+
+
+export const draftPost = (id: string) => {
+    return put(`/api/posts/${id}/draft`, {});
+}

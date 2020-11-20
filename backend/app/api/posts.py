@@ -103,6 +103,22 @@ def get_published_posts():
     return jsonify(data)
 
 
+@bp.route('/posts/<hash_id>/publish', methods=['PUT'])
+@token_auth.login_required
+def publish_post(hash_id):
+    post = Post.get_or_404(hash_id)
+    post.action_publish()
+    db.session.commit()
+    return jsonify(True)
+
+@bp.route('/posts/<hash_id>/draft', methods=['PUT'])
+@token_auth.login_required
+def draft_post(hash_id):
+    post = Post.get_or_404(hash_id)
+    post.action_draft()
+    db.session.commit()
+    return jsonify(True)
+
 @bp.route('/posts', methods=['POST'])
 @token_auth.login_required
 def create_post():
