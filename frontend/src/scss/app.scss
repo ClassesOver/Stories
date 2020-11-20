@@ -81,6 +81,10 @@ $primary-color: #612c2c;
     align-items: center;
   }
   .search-txt {
+    &.active {
+        width: 240px;
+        padding: 0 6px;
+    }
     border: none;
     background: none;
     outline: none;
