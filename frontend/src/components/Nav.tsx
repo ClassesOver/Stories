@@ -15,7 +15,6 @@ export default () => {
       <Nav className="tm-nav">
         <Nav.Link className="tm-nav-link" as={Link} to="/expore" >Expore</Nav.Link>
         {isAuthenticated ? <Nav.Link className="tm-nav-link" as={Link} to="/expore/me/stories" >Stories</Nav.Link>: ''}
-        <Nav.Link className="tm-nav-link" target="black" href="http://resume.troubled-me.com" >Hire me</Nav.Link>
       </Nav>
       <Search className="tm-search" placeholder="Search" />
       <AuthButton />

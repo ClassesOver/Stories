@@ -38,8 +38,6 @@ api.interceptors.response.use((response) => {
     responseCallError();
     let code = error.response.status;
     let message = HTTP_STATUS_CODES[code];
-    let token = getCookie('access_token');
-    queue.enqueue(message);
     return Promise.reject({ error, message });
 });
 
@@ -172,4 +170,10 @@ export const publishPost = (id: string) => {
 
 export const draftPost = (id: string) => {
     return put(`/api/posts/${id}/draft`, {});
+}
+
+export const logOut = () => {
+    return post('/api/logout', {}).then(() => {
+        removeCookie('access_token');
+    });
 }

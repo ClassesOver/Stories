@@ -8,6 +8,10 @@ $text-shadow: #612c2c63;
 $clap-seceond-color: #ad454e;
 $primary-color: #612c2c;
 
+:root {
+    --primary-color: $primary-color
+}
+
 #tm-navbar {
   background: #c1575780;
 }
@@ -496,4 +500,15 @@ button {
 .tm-tabpanel {
   overflow: auto;
   height: 400px;
+}
+
+.tm-dialog-actions {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    transition: all 0.3s ease;
+    justify-content: center;
+    button {
+        width: 40%;
+    }
 }

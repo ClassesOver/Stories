@@ -11,16 +11,31 @@ _ModelMap = {
     'post': Post
 }
 
+@bp.route('/logout', methods=['POST'])
+@token_auth.login_required
+def logout():
+    token_auth.current_user().revoke_token()
+    db.session.commit()
+    return '', 204
+
 @bp.route('/login', methods=['POST'])
 def login():
     payload = request.json
     username = payload['username']
     password = payload['password']
     user = User.query.filter_by(username=username).first()
-    if user is None or not user.check_password(password):
+    if user is None:
         return jsonify(
             {
-                'user': {},
+                'user': None,
+                'message': 'The user cannot exist.'
+            }
+        )
+    elif user and not user.check_password(password):
+        return jsonify(
+            {
+                'user': None,
+                'message': 'The password is incorrect.'
             }
         )
     else:
@@ -28,7 +43,8 @@ def login():
         user_d['access_token'] = user.get_token()
         db.session.commit()
         return jsonify({
-            'user': user_d
+            'user': user_d,
+            'message': 'User login succeeded.'
         })
 
 
