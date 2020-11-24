@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import { Icon, IconButton, MenuItem, Menu } from '@material-ui/core';
@@ -19,15 +19,9 @@ export default (props: IDataGridProps) => {
     const [rows, setRows] = React.useState<{ id: string, title: string, timestamp: string }[]>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
     const [links, setLinks] = React.useState({prev: null, next: null});
-    const [reload, setReload] = React.useState(0);
     const history = useHistory();
-    const handlePageChange = (params: any) => {
-        setPage(params.page);
-    };
-
-    React.useEffect(() => {
-        let active = true;
-
+     let active = true;
+    const update = () => {
         (async () => {
             setLoading(true);
             const resp = await props.fetch({ ...props.data, page, pageSize: props.pageSize });
@@ -41,12 +35,10 @@ export default (props: IDataGridProps) => {
             setPageCount(resp.data._meta.total_pages);
             setLoading(false);
         })();
-
-        return () => {
-            active = false;
-        };
-    }, [page, props.data, reload]);
-    const onClickRow = () => { };
+    }
+    useEffect(() => {
+        update();
+    }, [page]);
     const onPrevPage = (event: React.MouseEvent<HTMLSpanElement>) => {
         event.stopPropagation();
         setPage(page - 1);
@@ -60,7 +52,7 @@ export default (props: IDataGridProps) => {
     };
     const doDelete = async (id: string) => {
         await api.removePost(id);
-        setReload(reload +1);
+        update();
     };
     return (
         <div className="tm-dv" data-page={page}>
