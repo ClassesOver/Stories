@@ -134,6 +134,8 @@ class User(UserMixin, db.Model):
     notifications = db.relationship('Notification', backref='user',
                                     lazy='dynamic')
     tasks = db.relationship('Task', backref='user', lazy='dynamic')
+
+    avatar_src = db.Column(db.Text())
     
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -145,7 +147,8 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
     
     def avatar(self, size):
-        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+        email = self.email and  self.email.lower() or ''
+        digest = md5(email.encode('utf-8')).hexdigest()
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(
             digest, size)
     
@@ -223,10 +226,7 @@ class User(UserMixin, db.Model):
             'email'         : self.email,
             'github'        : self.github,
             '_links'        : {
-                'self'     : url_for('api.get_user', id=self.id),
-                'followers': url_for('api.get_followers', id=self.id),
-                'followed' : url_for('api.get_followed', id=self.id),
-                'avatar'   : self.avatar(128)
+                'avatar'   : self.avatar_src or self.avatar(128)
             }
         }
         if include_email:

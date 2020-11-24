@@ -51,5 +51,18 @@ def login():
 @bp.route('/user_info', methods=['GET'])
 @token_auth.login_required
 def user_info():
+    no_access_token = request.args.get('no_access_token', '')
+    if no_access_token:
+        return jsonify(current_user.to_dict(access_token=False))
     return jsonify(current_user.to_dict(access_token=True))
 
+@bp.route('/user_info', methods=['PUT'])
+@token_auth.login_required
+def save_user_info():
+    print(request.json)
+    values = request.json.get('values')
+    for k, v in values.items():
+        setattr(current_user, k ,v)
+    db.session.add(current_user)
+    db.session.commit()
+    return jsonify(current_user.to_dict(access_token=False))

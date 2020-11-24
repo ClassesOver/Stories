@@ -106,8 +106,16 @@ export const logIn = (username: string, password: string) => {
     let data = { username, password };
     return post('/api/login', data);
 }
-export const getUserInfo = () => {
-    return get('/api/user_info');
+export const getUserInfo = (accessToken: boolean = true) => {
+    if (accessToken) {
+        return get('/api/user_info');
+    } else {
+        return get('/api/user_info?no_access_token=1');
+    }
+    
+}
+export const saveUser = (data: { [key: string]: any} = {}) => {
+    return put('/api/user_info', data);
 }
 
 export const getPosts = (limit: number = 20, offset: number = 0) => {
