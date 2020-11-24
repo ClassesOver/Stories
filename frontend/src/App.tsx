@@ -1,5 +1,5 @@
 import React, { Context, useState, useEffect } from 'react';
-import { AppLayout, Nav, Stories } from './components';
+import { AppLayout, Nav, SignUp, SignIn } from './components';
 import AppContext from './context';
 import { getUserInfo } from './api'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -29,11 +29,6 @@ const theme = createMuiTheme({
             main: '#612c2c',
           },
     },
-    overrides: {
-        MuiButton: {
-            
-        }
-    }
 });
 let errorMessageWorker: any = null;
 function App() {
@@ -102,6 +97,8 @@ function App() {
                                     />
                                 </Route>
                                 <Route path="/expore" component={AppLayout} />
+                                <Route path="/signup" exact component={SignUp} />
+                                <Route path="/signin" exact component={SignIn} />
                                 <Route path="*">
                                     <div />
                                 </Route>

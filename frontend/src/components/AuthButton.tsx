@@ -50,6 +50,12 @@ const useStyles = makeStyles((theme: Theme) =>
             outline: 'none',
         }
     },
+    signInButton: {
+        backgroundColor: 'white',
+        '&:hover' : {
+            backgroundColor: '#dad7d7',
+        }
+    },
     profileDrawer: {
         width: '40vw',
         minWidth: '360px',
@@ -216,18 +222,14 @@ const ProfileDrawer: React.FC<IProfileProps> = (props) => {
 const AuthButton = withRouter(({history}) => {
     const classes = useStyles();
     const {authenticated, setAuthenticated, isAuthenticated} = useContext(AppContext);
-    const [open, setOpen] = React.useState(false);
     const [menusOpen, setMenusOpen] = React.useState(false);
     const [drawerOpen, setDrawerOpen] = React.useState(false);
     const handleClick: React.MouseEventHandler = (ev) => {
         ev.stopPropagation();
-        setOpen(true);
+        history.push('/signin');
     }
     const username = authenticated.userInfo.username || '';
     const avatar = authenticated.userInfo._links && authenticated.userInfo._links.avatar;
-    const handleClose = () => {
-        setOpen(false);
-    };
     const anchorRef = React.useRef<HTMLButtonElement>(null);
 
     const handleToggle = () => {
@@ -237,8 +239,7 @@ const AuthButton = withRouter(({history}) => {
 
     function handleListKeyDown(event: React.KeyboardEvent) {
         if (event.key === 'Tab') {
-        event.preventDefault();
-        setOpen(false);
+            event.preventDefault();
         }
     }
 
@@ -295,8 +296,7 @@ const AuthButton = withRouter(({history}) => {
         </div>
     </div>) : (
         <div className='auth-login'>
-            <LogInDialog open={open} onClose={handleClose} />
-            <button  className="btn btn-secondary" onClick={handleClick} type="button">Sign in</button>
+            <Button variant="outlined" className={classes.signInButton}  onClick={handleClick}>Sign in</Button>
         </div>
 
         

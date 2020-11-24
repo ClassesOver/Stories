@@ -9,7 +9,8 @@ import { toastError } from '../errors';
 import PostSingleView from './PostSingleView';
 import Stories from './Stories';
 import AppContext from '../context';
-
+import SignUp from './SignUp';
+import SignIn from './SignIn';
 interface Props {
 };
 
@@ -50,5 +51,7 @@ const AppLayout: React.FC<any> = () => {
 export {
     Nav,
     AppLayout,
-    Stories
+    Stories,
+    SignUp,
+    SignIn,
 }

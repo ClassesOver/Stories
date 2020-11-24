@@ -502,7 +502,7 @@ button {
   height: 400px;
 }
 
-.tm-dialog-actions {
+.tm-signin-actions {
     display: flex;
     align-items: center;
     width: 100%;
@@ -511,4 +511,18 @@ button {
     button {
         width: 40%;
     }
+}
+
+.tm-signin{
+    background: white;
+    display: flex;
+    align-items: center;
+    width: 360px;
+    height: 400px;
+    margin: auto;
+    margin-top: 60px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    justify-content: space-around;
+    flex-flow: column;
 }

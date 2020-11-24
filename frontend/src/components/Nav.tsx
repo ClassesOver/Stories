@@ -2,8 +2,9 @@ import React, { useContext } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import { Link } from 'react-router-dom';
-import Search from './Search'
-import AuthButton from './AuthButton'
+import Search from './Search';
+import AuthButton from './AuthButton';
+import SignupButton from './SignUpButton';
 import AppContext from '../context';
 
 export default () => {
@@ -18,6 +19,7 @@ export default () => {
       </Nav>
       <Search className="tm-search" placeholder="Search" />
       <AuthButton />
+      <SignupButton />
     </Navbar.Collapse>
   </Navbar>
 }
