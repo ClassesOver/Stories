@@ -13,6 +13,7 @@ import rq
 from app import db, login
 from app.search import add_to_index, remove_from_index, query_index
 from flask_login import current_user
+import random
 
 
 class SearchableMixin(object):
@@ -101,6 +102,37 @@ class Tag(db.Model):
                 user_id = current_user.id
         tag = Tag(name, user_id)
         db.session.add(tag)
+
+class VerificationCode(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), index=True)
+    vcode = db.Column(db.String(6), index=True)
+    expiration = db.Column(db.DateTime)
+    vtype = db.Column(db.String(12))
+    active = db.Column(db.Boolean(), default=True)
+
+    @staticmethod
+    def generate(email, vtype, expires_in = 60 * 3):
+        o = VerificationCode()
+        o.email = email
+        o.expiration = datetime.utcnow() + timedelta(seconds=expires_in)
+        o.vtype = vtype
+        o.vcode = VerificationCode.get_code()
+        return o
+
+
+    @staticmethod
+    def get_code():
+        code_list = []
+        for i in range(10):   # 0~9
+            code_list.append(str(i))
+        for i in range(65, 91):  # A-Z    
+            code_list.append(chr(i))
+        for i in range(97, 123):  # a-z
+            code_list.append(chr(i))
+        code = random.sample(code_list,6)
+        code_num = ''.join(code)
+        return code_num
 
 
 class User(UserMixin, db.Model):

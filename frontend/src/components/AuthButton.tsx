@@ -1,7 +1,6 @@
 import {withRouter} from 'react-router-dom';
 import AppContext from '../context'
 import React, {useContext, useState, useEffect} from 'react';
-import {LogInDialog} from './Dialog'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Avatar from '@material-ui/core/Avatar';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';

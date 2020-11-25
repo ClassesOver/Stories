@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from app.models import User
-from flask import jsonify, request
+from flask import jsonify, request, render_template
 from flask_login import current_user
 from app.api import bp
 from app.api.auth import token_auth
 from app import db
-from app.models import Post
+from app.models import Post, VerificationCode
+from app.email import send_email
+from datetime import datetime, timedelta
 
 _ModelMap = {
     'post': Post
@@ -59,10 +61,62 @@ def user_info():
 @bp.route('/user_info', methods=['PUT'])
 @token_auth.login_required
 def save_user_info():
-    print(request.json)
     values = request.json.get('values')
     for k, v in values.items():
         setattr(current_user, k ,v)
     db.session.add(current_user)
     db.session.commit()
     return jsonify(current_user.to_dict(access_token=False))
+
+@bp.route('/verification_code', methods=['POST'])
+def generate_verification_code():
+    email = request.json.get('email', '')
+    vtype = request.json.get('vtype', '')
+
+    user = User.query.filter_by(email=email).all()
+    if user: 
+        return jsonify({'error': {
+            'email': 'This email has been used. Please enter a new email address.'
+        }})
+    obj = VerificationCode.generate(email, vtype)
+    db.session.add(obj)
+    db.session.commit()
+    html = render_template('user/verification_code.html', vcode = obj.vcode)
+    subject = "Please confirm your email"
+    send_email(subject, 'System', [email], '', html)
+    return jsonify({'error': {}})
+
+@bp.route('/signup', methods=['POST'])
+def signup():
+    email = request.json.get('email', '')
+    password = request.json.get('password', '')
+    verification_code = request.json.get('verification_code', '')
+    username = request.json.get('username', '')
+    vcode = VerificationCode.query.filter_by(active=True).filter_by(email=email).filter_by(vcode=verification_code).all()
+    user = User.query.filter_by(email=email).all()
+    if user:
+        return jsonify({'error': {
+            'email': 'This email has been used. Please enter a new email address.'
+        }, 'user': False})
+    if not vcode:
+        return jsonify({'error': {
+            'verification_code': 'Wrong verification code.'
+        }, 'user': False})
+    else:
+        flag = False
+        for v in vcode:
+            if v.expiration <= datetime.utcnow() + timedelta(30):
+                flag = True
+                break
+        if not flag:
+            return jsonify({'error': {
+                    'verification_code': 'The verification code has expired.'
+                }, 'user': False})
+    user = User(email=email, username = username)
+    user.set_password(password)
+    db.session.add(user)
+    for v in vcode:
+        v.active = False
+        db.session.add(v)
+    db.session.commit()
+    return jsonify({'error': {}, 'user': user.hash_id})

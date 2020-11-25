@@ -502,7 +502,7 @@ button {
   height: 400px;
 }
 
-.tm-signin-actions {
+.tm-signin-actions , .tm-signup-actions{
     display: flex;
     align-items: center;
     width: 100%;
@@ -513,12 +513,12 @@ button {
     }
 }
 
-.tm-signin{
+.tm-signin, .tm-signup{
     background: white;
     display: flex;
     align-items: center;
     width: 360px;
-    height: 400px;
+    height: 480px;
     margin: auto;
     margin-top: 60px;
     padding: 20px;

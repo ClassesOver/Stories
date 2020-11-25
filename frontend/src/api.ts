@@ -185,3 +185,11 @@ export const logOut = () => {
         removeCookie('access_token');
     });
 }
+
+export const sendVerificationCode = (data: { [key: string]: any}) => {
+    return post('/api/verification_code', data);
+}
+
+export const signUp = (data: { [key: string]: any}) => {
+    return post('/api/signup', data);
+}

@@ -39,32 +39,28 @@ interface ILoginState {
     username: string;
     password: string;
     showPassword: boolean;
-    disabled: boolean;
 }
 const SignIn: React.FC<ISignInProps> = () => {
     const history = useHistory();
     const [values, setValues] = useState<ILoginState>({
         username: '',
         password: '',
-        showPassword: false,
-        disabled: true
+        showPassword: false
     });
+    const [submitDisabled, setSubmitDisabled] = useState(false);
     const { authenticated, setAuthenticated } = useContext(AppContext);
     const [logIning, setLogIning] = useState(false);
     const { addToast } = useToasts();
     const handleChange = (prop: keyof ILoginState) => (event: React.ChangeEvent<HTMLInputElement>) => {
         let disabled = (values.password.length == 0 || values.password.length == 0)
-        setValues({ ...values, [prop]: event.target.value, disabled });
+        setValues({ ...values, [prop]: event.target.value});
     };
-    useEffect(() => { validate() }, [values]);
-    const validate = () => {
-        if (values.username.length === 0) {
-
-        }
-        if (values.password.length === 0) {
-
-        }
-    }
+    useEffect(() => {
+        let flag = !(values.password.length > 0 &&
+            values.username.length > 0 &&
+            values.password.length > 0);
+        setSubmitDisabled(flag);
+    }, [values]);
     const handleClickShowPassword = () => {
         setValues({ ...values, showPassword: !values.showPassword });
     };
@@ -98,7 +94,6 @@ const SignIn: React.FC<ISignInProps> = () => {
                     appearance: 'warning',
                     autoDismiss: true,
                 });
-                history.push('/');
             }
         });
     }
@@ -122,6 +117,7 @@ const SignIn: React.FC<ISignInProps> = () => {
                         appearance: 'success',
                         autoDismiss: true,
                     });
+                    history.push('/');
                 } else {
                     addToast(message, {
                         appearance: 'warning',
@@ -188,7 +184,7 @@ const SignIn: React.FC<ISignInProps> = () => {
                 </div>
                 :
                 <div className="tm-signin-actions">
-                    <Button disabled={values.disabled} onClick={handleSubmit} variant="contained" disableElevation>
+                    <Button disabled={submitDisabled} onClick={handleSubmit} variant="contained" disableElevation>
                         Sign In
                     </Button>
                     <Button onClick={onCancel} >Cancel</Button>
