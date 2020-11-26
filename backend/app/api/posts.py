@@ -42,34 +42,25 @@ def get_posts():
          Post.query.filter_by(published=True).order_by(Post.timestamp.desc()).limit(limit).offset(offset).all()])
 
 
-@bp.route('/posts/<hash_id>/comments', methods=['POST'])
-def create_post_comment(hash_id):
+@bp.route('/comments', methods=['POST'])
+@token_auth.login_required
+def create_post_comment():
+    hash_id = request.json.get('post_id')
     post = Post.get_or_404(hash_id)
-    if current_user and not current_user.is_anonymous:
-        author = current_user.username
-        email = current_user.email
-    else:
-        author = request.json.get('author')
-        email = request.json.get('email')
-    page = request.json.get('page')
-    per_page = request.json.get('per_page')
-    text = request.json.get('text')
-    comment = Comment(text=text, author=author, email=email, post_id=post.id)
+    author = current_user.username
+    email = current_user.email
+    text = request.json.get('content')
+    comment = Comment(text=text, author=author,
+                      user_id=current_user.id, email=email, post_id=post.id)
     comment.save()
     db.session.commit()
-    query = Comment.query.filter(Comment.post_id == post.id).order_by(Comment.thread_timestamp.desc(),
-                                                              Comment.path.asc())
+    return jsonify(True)
 
-    resources = query.paginate(page, per_page, False)
-    for item in resources.items:
-        if item.id == comment.id:
-            return {'page': page}
-    return {'page': page + 1 ,'per_page': per_page}
-
-@bp.route('/posts/<hash_id>/comments', methods=['GET'])
-def get_post_comments(hash_id):
-    post = Post.get_or_404(hash_id)
+@bp.route('/comments', methods=['GET'])
+def get_post_comments():
     page = request.args.get('page', 1, type=int)
+    hash_id = request.args.get('post_id')
+    post = Post.get_or_404(hash_id)
     per_page = min(request.args.get('per_page', 10, type=int), 100)
     query = Comment.query.filter(Comment.post_id == post.id).order_by(Comment.thread_timestamp.desc(),
                                                                       Comment.path.asc())

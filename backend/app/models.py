@@ -413,7 +413,7 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(140))
     author = db.Column(db.String(32))
-    email = db.Column(db.String(120), index=True, unique=True)
+    email = db.Column(db.String(120), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
     thread_timestamp = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
@@ -428,12 +428,13 @@ class Comment(db.Model):
         return Comment(text=text, parent = self)
     
     def to_dict(self):
+        user = User.query.get(self.user_id)
         data = {
-            'id'              : self.hash_id,
-            'text'           : self.text,
-            'body'            : self.body,
-            'author'          : self.author,
-            'timestamp'       : self.timestamp.isoformat() + 'Z'
+            'id': self.hash_id,
+            'text': self.text,
+            'author': user and user.to_dict(),
+            'email': self.email,
+            'timestamp': self.timestamp.isoformat() + 'Z'
         }
         return data
     
