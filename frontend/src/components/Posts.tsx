@@ -35,8 +35,6 @@ interface IPostProps {
 
 export const limit = 20;
 
-const charLimits = 300;
-
 const Post: React.FC<IPostProps> = (props) => {
     const classes = useStyles();
     const {post} = props as any;
@@ -65,7 +63,7 @@ const Post: React.FC<IPostProps> = (props) => {
     }
     return (<div className="tm-post-piece" onClick={handleViewPost} >
          <h6>
-             <Avatar src={post.author.avatar} className={classes.root} alt={post.author.username}>{post.author.username && post.author.username[0]}
+             <Avatar src={post.author._links.avatar} className={classes.root} alt={post.author.username}>{post.author.username && post.author.username[0]}
              </Avatar><Moment format="LL" >{post.timestamp}</Moment>
              <span className='words'>{words} words</span>
          </h6>
@@ -77,7 +75,7 @@ const Posts: React.FC<IPostsProps> = (props) => {
     const {posts} = props;
     return <div className="tm-posts" >
         {
-            posts.map((post, index) => {
+            posts.map((post) => {
                 return <Post key={post.id} post={post} />
             })
         }

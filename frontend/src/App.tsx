@@ -1,4 +1,4 @@
-import React, { Context, useState, useEffect } from 'react';
+import React, {useState, useEffect } from 'react';
 import { AppLayout, Nav, SignUp, SignIn } from './components';
 import AppContext from './context';
 import { getUserInfo } from './api'
@@ -8,7 +8,6 @@ import { queue } from './api';
 import BlockUi from 'react-block-ui';
 import 'react-block-ui/style.css';
 import 'animate.css';
-import PrivateRoute from "./route";
 import { ThemeProvider } from '@material-ui/styles';
 import { setBlockUiCallback } from "./blocking";
 import {

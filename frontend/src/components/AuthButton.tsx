@@ -4,7 +4,7 @@ import React, {useContext, useState, useEffect} from 'react';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Avatar from '@material-ui/core/Avatar';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { grey, blue } from '@material-ui/core/colors';
+import { grey } from '@material-ui/core/colors';
 import Grow from '@material-ui/core/Grow';
 import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
@@ -176,8 +176,8 @@ const ProfileDrawer: React.FC<IProfileProps> = (props) => {
                 src={state.avatar_src} /> : <Avatar alt={state.username} src={state && state._links && state._links.avatar} className={classes.large} />}
             <TextField fullWidth
                 onClick={startEdit}
+                disabled
                 margin="normal" onChange={onEmailChange} value={state.email} size="small" id="input-email" label="Email" InputProps={{
-                    readOnly: mode === 'readonly',
                     startAdornment: (
                         <InputAdornment position="start">
                             <Icon className="fa fa-envelope icon" style={{ fontSize: 16 }} />

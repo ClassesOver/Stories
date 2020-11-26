@@ -27,7 +27,11 @@ def search_posts():
     else:
         return jsonify({})
 
-
+@bp.route('/posts/trending', methods=['GET'])
+def get_trending_posts():
+    return jsonify(
+        [post.to_dict() for post in
+         Post.query.filter_by(published=True).order_by(Post.read_count.desc()).order_by(Post.clap_count.desc()).limit(10).all()])
 
 @bp.route('/posts', methods=['GET'])
 def get_posts():
@@ -70,14 +74,6 @@ def get_post_comments(hash_id):
     query = Comment.query.filter(Comment.post_id == post.id).order_by(Comment.thread_timestamp.desc(),
                                                                       Comment.path.asc())
     data = Comment.to_collection_dict(query, page, per_page, 'api.get_post_comments', hash_id=hash_id)
-    return jsonify(data)
-
-
-@bp.route('/posts/trending', methods=['GET'])
-def get_posts_trending():
-    query = Post.query.filter(Post.user_id == current_user.id).filter(Post.published == True).order_by(
-        Post.timestamp.desc()).limit(10)
-    data = [i.to_dict() for i in query.all()]
     return jsonify(data)
 
 
@@ -142,6 +138,9 @@ def delete_post(hash_id):
 def get_post(hash_id):
     post = Post.get_or_404(hash_id)
     if post and post.published:
+        post.read_count = (post.read_count or 0 )+ 1
+        db.session.add(post)
+        db.session.commit()
         return jsonify(post.to_dict())
     elif post and current_user and not current_user.is_anonymous and post.user_id == current_user.id:
         return jsonify(post.to_dict())

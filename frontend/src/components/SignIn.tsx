@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState, useContext } from "react";
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import * as api from '../api';
 import { Button } from "@material-ui/core";
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Visibility from '@material-ui/icons/Visibility';

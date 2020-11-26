@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import { getCookie, removeCookie } from "./utils";
 import axios, { AxiosResponse } from "axios";
 import { HTTP_STATUS_CODES } from './errors'
@@ -192,4 +191,8 @@ export const sendVerificationCode = (data: { [key: string]: any}) => {
 
 export const signUp = (data: { [key: string]: any}) => {
     return post('/api/signup', data);
+}
+
+export const getTrendingStories = () => {
+    return get('/api/posts/trending');
 }

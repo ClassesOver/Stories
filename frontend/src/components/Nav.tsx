@@ -8,7 +8,7 @@ import SignupButton from './SignUpButton';
 import AppContext from '../context';
 
 export default () => {
-  const {authenticated, setAuthenticated, isAuthenticated} = useContext(AppContext);
+  const {isAuthenticated} = useContext(AppContext);
   return <Navbar id="tm-navbar" variant="dark"  sticky="top" expand="sm"  >
     <Navbar.Brand className="tm-nav-brand" as={Link} to="/">I'm troubled</Navbar.Brand>
     <Navbar.Toggle aria-controls="basic-navbar-nav" />

@@ -315,6 +315,7 @@ class Post(SearchableMixin, db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), default=_default_user)
     published = db.Column(db.Boolean(), default=False)
     clap_count = db.Column(db.Integer, default=0)
+    read_count = db.Column(db.Integer, default=0)
     
     def add_to_index(self):
         if self.published:

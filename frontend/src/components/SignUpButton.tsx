@@ -1,8 +1,6 @@
-import { CodeBlock } from "react-code-blocks";
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
-import * as api from '../api';
 import { Button } from "@material-ui/core";
 interface ISignupButton {
 

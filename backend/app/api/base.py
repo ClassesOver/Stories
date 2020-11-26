@@ -98,6 +98,11 @@ def signup():
         return jsonify({'error': {
             'email': 'This email has been used. Please enter a new email address.'
         }, 'user': False})
+    user = User.query.filter_by(username=username).all()
+    if user:
+        return jsonify({'error': {
+            'username': 'This username has been used. Please enter a new username.'
+        }, 'user': False})
     if not vcode:
         return jsonify({'error': {
             'verification_code': 'Wrong verification code.'

@@ -11,8 +11,7 @@ import Stories from './Stories';
 import AppContext from '../context';
 import SignUp from './SignUp';
 import SignIn from './SignIn';
-interface Props {
-};
+import StoriesTrending from './StoriesTrending';
 
 const AppLayout: React.FC<any> = () => {
     let { path} = useRouteMatch();
@@ -27,7 +26,10 @@ const AppLayout: React.FC<any> = () => {
     return <div className="layout">
         <Switch>
             <Route exact path={`${path}`}>
-                <PostsView  />
+                <div className='tm-expore'>
+                    <PostsView  />
+                    <StoriesTrending />
+                </div>
             </Route>
             <Route exact path={`${path}/editor`}>
                 <Redirect to={`${path}/editor/new`} />

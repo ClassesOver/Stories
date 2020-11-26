@@ -1,4 +1,3 @@
-import { CodeBlock } from "react-code-blocks";
 import React, { useEffect, useRef, useState } from "react";
 import * as api from '../api';
 interface IClapButtonProps {

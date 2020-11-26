@@ -1,14 +1,10 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import * as api from '../api';
 import { useToasts } from 'react-toast-notifications';
 import BarLoader from "react-spinners/BarLoader";
 import { useHistory } from 'react-router-dom';
-import AppContext from '../context';
-import { Button, Grid, InputAdornment, Icon, TextField, IconButton } from "@material-ui/core";
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import { string } from "prop-types";
+import { Button, Grid, InputAdornment, Icon, TextField} from "@material-ui/core";
 interface ISignUpProps {
 
 }
@@ -23,6 +19,7 @@ interface IError {
     email: string;
     confirm: string;
     password: string;
+    username: string;
     verification_code: string;
 }
 type IErrorKey = keyof IError;
@@ -53,6 +50,7 @@ const SignUp: React.FC<ISignUpProps> = (props) => {
     const [errors, setErrors] = useState<IError>({
         email: '', password: '', confirm: '',
         verification_code: '',
+        username: '',
     });
     const history = useHistory()
     const { addToast } = useToasts();
@@ -68,7 +66,7 @@ const SignUp: React.FC<ISignUpProps> = (props) => {
         }
     }
     const isConfirmValid = () => {
-        if (values.password != values.confirm) {
+        if (values.password !== values.confirm) {
             setErrors({ ...errors, confirm: 'The two passwords are inconsistent.' });
             return false;
         } else {
@@ -84,17 +82,18 @@ const SignUp: React.FC<ISignUpProps> = (props) => {
         }
         event.stopPropagation();
         setDisabled(true);
-        let seconds = 60;
+        let secs = 60;
         if (timer) {
-            clearInterval(timer)
+            clearInterval(timer);
         }
         timer = setInterval(() => {
-            seconds = seconds - 1;
-            if (seconds >= 0) {
-                setSeconds(seconds);
+            if (secs >= 0) {
+                setSeconds(secs);
+                secs = secs - 1;
             } else {
                 setDisabled(false);
                 setSeconds(60);
+                clearInterval(timer);
             }
         }, 1000);
         try {
@@ -201,6 +200,8 @@ const SignUp: React.FC<ISignUpProps> = (props) => {
                     className={classes.margin}
                     id="tm-signup-username"
                     label="Username"
+                    error={hasError('username')}
+                    helperText={errors.username}
                     required
                     type="text"
                     onChange={handleChange('username')}

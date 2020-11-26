@@ -1,4 +1,4 @@
-import React, {useEffect, useContext, useState} from 'react';
+import React from 'react';
 import ReactMarkdown from 'react-markdown'
 import gfm from 'remark-gfm';
 import {InlineMath, BlockMath} from 'react-katex';
