@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {Avatar, Button, Icon} from '@material-ui/core';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import {useToasts} from 'react-toast-notifications'
 import * as api from "../api";
+import AppContext from '../context';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     avatar: {
@@ -19,6 +20,7 @@ interface IProfileProps {
     isFollowing: boolean;
 }
 const Profile: React.FC<IProfileProps> =  (props) => {
+    const {authenticated} = useContext(AppContext);
     const {author, isFollowing} = props;
     const [followed, setFollowed] = useState(isFollowing);
     const { addToast } = useToasts()
@@ -60,11 +62,11 @@ const Profile: React.FC<IProfileProps> =  (props) => {
     const classes = useStyles();
     return <div className={'tm-profile'}>
         <div className="base-container">
-        <div className="follow">
-            {followed ? <Button onClick={handleUnfollow} className={classes.btn}>Unfollow</Button>
-                      : <Button onClick={handleFollow} className={classes.btn}>Follow</Button>}
-        </div>
-        <Avatar className={classes.avatar} src={author._links.avatar} alt={author.username}>{author.username && author.username[0]}</Avatar>
+            {authenticated.userId !== author.id ? <div className="follow">
+                {followed ? <Button onClick={handleUnfollow} className={classes.btn}>Unfollow</Button>
+                    : <Button onClick={handleFollow} className={classes.btn}>Follow</Button>}
+            </div> : ''}
+            <Avatar className={classes.avatar} src={author._links.avatar} alt={author.username}>{author.username && author.username[0]}</Avatar>
             <div className="name">{author.username}</div>
             <div className="follow-count">{}{`${author.follower_count} followers . ${author.followed_count} following`}</div>
             {author.about_me ? <div className="about-me">{author.about_me}</div> : <></>}

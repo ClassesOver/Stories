@@ -1,12 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useEffect, useState } from 'react';
 import * as api from '../api';
-import AppContext from '../context';
 import MarkdownPreview from "./MarkdownPreview";
 import Moment from 'react-moment';
+import { useToasts } from 'react-toast-notifications';
 import Avatar from '@material-ui/core/Avatar';
 import readingTime from 'reading-time';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import {useHistory} from 'react-router-dom';
+import 'react-perfect-scrollbar/dist/css/styles.css';
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import _ from 'lodash';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -85,8 +88,8 @@ const Posts: React.FC<IPostsProps> = (props) => {
 export const PostsView :React.FC<IPostsViewProps> = (props) => {
     const [posts, setPosts] = useState([]);
     const [offset, setOffset] = useState(0);
-    const {authenticated} = useContext(AppContext);
-    const fetch = async (fresh: boolean = false) => {
+    const { addToast } = useToasts();
+    const fetch = async (fresh: boolean = false, container: HTMLElement | null  = null) => {
         let _offset;
         if (fresh) {
             _offset = 0
@@ -97,7 +100,15 @@ export const PostsView :React.FC<IPostsViewProps> = (props) => {
         if (data.length < limit) {
         }
         if (data.length === 0 ) {
-            return
+            addToast(`There are no more stories.`, {
+                appearance: 'info',
+                autoDismiss: true,
+            });
+            if (container) {
+                container.scrollTop = container.scrollTop - 80;
+            }
+            return;
+            
         }
         if (fresh) {
             setPosts(data);
@@ -107,15 +118,29 @@ export const PostsView :React.FC<IPostsViewProps> = (props) => {
             setPosts(newPosts);
             setOffset(newPosts.length);
         }
+        return data;
     }
     useEffect(() => {
-        fetch(true);
+        fetch(true, null);
     },[]);
-    const onMore = async (event: React.MouseEvent<HTMLButtonElement>) => {
-        fetch();        
-    }
+    let busy = false;
+    const onScrollDown = _.debounce( async (container) => {
+        if (busy) {
+            return;
+        }
+        let st = container.scrollTop;
+        let sh = container.scrollHeight;
+        let h = container.clientHeight;
+        if (st + h >= sh) {
+            busy = true;
+            await fetch(false, container);
+            busy = false;
+        }       
+    },1000);
     return (<div className="tm-posts-view">
-        <Posts posts={posts} />      
+        <PerfectScrollbar onScrollDown={onScrollDown}>
+            <Posts posts={posts} />
+        </PerfectScrollbar>
     </div>)
 }
 

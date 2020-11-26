@@ -104,8 +104,9 @@ $primary-color: #612c2c;
   }
 }
 .tm-posts-view{
-  margin: 30px 50px;
-  max-width: 780px;
+  padding: 50px;
+  max-width: 70vw;
+  overflow: auto;
   height: 100%;
 }
 .tm-single-post-view-container {
@@ -304,8 +305,7 @@ $primary-color: #612c2c;
 }
 .layout {
   position: relative;
-  overflow: auto;
-  height: 100%;
+  height: calc(100% - 56px);
 }
 
 @media (max-width: 767px) {
@@ -527,6 +527,7 @@ button {
 }
 
 .tm-expore {
+    height: 100%;
     display: flex;
     .tm-posts-view {
         flex: 2;
@@ -556,6 +557,7 @@ button {
         display: flex;
         flex-direction: column;
         max-width: 300px;
+        max-height: 400px;
         border-radius: 5px;
         background: #f1f0ec;
         margin: 30px 10px;
