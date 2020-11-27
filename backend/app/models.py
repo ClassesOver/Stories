@@ -68,8 +68,8 @@ followers = db.Table(
 
 claps = db.Table(
     'claps',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('post_id', db.Integer, db.ForeignKey('post.id'))
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE')),
+    db.Column('post_id', db.Integer, db.ForeignKey('post.id', ondelete='CASCADE'))
 )
 tags = db.Table(
     'tags',
