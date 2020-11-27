@@ -161,11 +161,6 @@ export const removePost = (postId:  string) => {
     return  remove(`/api/posts/${postId}`);
 }
 
-export const getComments = (data: { [key: string]: any }) => {
-    const {page, pageSize: per_page,id} = data;
-    return get(`/api/posts/${id}/comments?page=${page}&per_page=${per_page}`);
-}
-
 export const searchPost = (data: {[key: string]: any}) => {
     return get(`/api/posts/search?value=${data.value}&page=${data.page}&per_page${data.per_page}`);
 }
@@ -195,4 +190,13 @@ export const signUp = (data: { [key: string]: any}) => {
 
 export const getTrendingStories = () => {
     return get('/api/posts/trending');
+}
+
+export const postComment = (data: { [key: string]: any}) => {
+    return post('/api/comments', data);
+};
+
+export const getComments = (data: { [key: string]: any }) => {
+    const {id} = data;
+    return get(`/api/comments?post_id=${id}`);
 }

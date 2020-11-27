@@ -105,7 +105,7 @@ $primary-color: #612c2c;
 }
 .tm-posts-view{
   padding: 50px;
-  max-width: 70vw;
+  max-width: 75vw;
   overflow: auto;
   height: 100%;
 }
@@ -195,14 +195,19 @@ $primary-color: #612c2c;
   max-width: 960px;
   margin: 20px auto;
 }
+.tm-posts {
+    padding-bottom: 80px;
+}
 .tm-posts, .tm-single-post {
   width: 100%;
   .actions {
+    box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
     padding: 60px 10px;
-    position: absolute;
+    position: fixed;
     right: 10px;
     top: 50%;
-    background: white;
+    border-radius: 3px;
+    background: #fffff0;
     transform: translateY(-50%);
   }
   .tm-single-groud {
@@ -545,10 +550,10 @@ button {
         h4 {
             padding: 15px 8px;
             padding: 20px;
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
             color: #ffffff;
-            background: #c1c1c1;
+            background: #612c2c;
             font-size: 1.2rem;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -556,10 +561,52 @@ button {
         flex: 1 1;
         display: flex;
         flex-direction: column;
-        max-width: 300px;
+        max-width: 250px;
         max-height: 400px;
-        border-radius: 5px;
-        background: #f1f0ec;
+        border-radius: 3px;
+        background: #f5f4f3fc;
         margin: 30px 10px;
     }
+}
+
+.tm-comments {
+    padding: 20px;
+    transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    background-color: white;
+    .tm-comments-count {
+        padding: 8px;
+        border-bottom: 1px solid #612c2c4f;
+        color: #6b5a5a;
+    }
+    .open {
+        heigth: auto;
+        opacity: 1;
+    }
+    .close {
+        height: 0px;
+        opacity: 0;
+        overflow: hidden;
+    }
+}
+.tm-cm{
+    margin: 15px 10px;
+    &.level {
+        padding-left: 40px;
+    }
+}
+.tm-cm-h {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    .email {
+        margin: 0px 15px;
+        font-size: 12px;
+        color: #4c4848;
+    }
+}
+.tm-cm-m {
+    padding: 8px;
+    color: #403b3b;
+    margin: 5px 20px;
+    background: #612c2c0f;
 }

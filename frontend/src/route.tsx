@@ -15,7 +15,7 @@ const PrivateRoute: React.FC<IPrivateRouteProps> = (props) => {
                 children
             ) : (   <>
                     {
-                        addToast('Unauthorized', {
+                        addToast('Unauthorized, Please sign in', {
                             appearance: 'error',
                             autoDismiss: true,
                           })
