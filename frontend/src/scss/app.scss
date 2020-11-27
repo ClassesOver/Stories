@@ -22,6 +22,9 @@ $primary-color: #612c2c;
   color: white !important;
   text-transform: uppercase;
   font-weight: bold;
+  border-right: 1px solid #ad96967d;
+  padding: 0px 15px;
+  font-size: 1.1rem;
 }
 .tm-nav-link {
   &:hover {
@@ -554,7 +557,7 @@ button {
             border-top-right-radius: 3px;
             color: #ffffff;
             background: #612c2c;
-            font-size: 1.2rem;
+            font-size: 1rem;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -609,4 +612,13 @@ button {
     color: #403b3b;
     margin: 5px 20px;
     background: #612c2c0f;
+}
+.tm-nav-brand {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    .greeting {
+        font-size: 12px;
+        text-transform: none;
+    }
 }
