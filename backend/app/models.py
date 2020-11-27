@@ -434,6 +434,9 @@ class Comment(db.Model):
             'text': self.text,
             'author': user and user.to_dict(),
             'email': self.email,
+            'parent_id': self.parent_id,
+            'reply_to': self.parent and self.parent.email,
+            'level': self.level(),
             'timestamp': self.timestamp.isoformat() + 'Z'
         }
         return data

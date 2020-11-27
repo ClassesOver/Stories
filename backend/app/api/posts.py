@@ -45,27 +45,43 @@ def get_posts():
 @bp.route('/comments', methods=['POST'])
 @token_auth.login_required
 def create_post_comment():
-    hash_id = request.json.get('post_id')
-    post = Post.get_or_404(hash_id)
-    author = current_user.username
-    email = current_user.email
-    text = request.json.get('content')
-    comment = Comment(text=text, author=author,
-                      user_id=current_user.id, email=email, post_id=post.id)
-    comment.save()
-    db.session.commit()
-    return jsonify(True)
+    post_hash_id = request.json.get('post_id', False)
+    comment_hash_id = request.json.get('id', False)
+    if post_hash_id:
+        post = Post.get_or_404(post_hash_id)
+        author = current_user.username
+        email = current_user.email
+        text = request.json.get('content')
+        comment = Comment(text=text, author=author,
+                          user_id=current_user.id, email=email, post_id=post.id)
+        comment.save()
+        db.session.commit()
+        query = Comment.query.filter(Comment.post_id == comment.post_id).order_by(Comment.thread_timestamp.desc(),
+                                                                                  Comment.path.asc())
+        return jsonify([i.to_dict() for i in query.all()])
+    if comment_hash_id:
+        print(request.json)
+        parent_comment = Comment.get_or_404(comment_hash_id)
+        author = current_user.username
+        email = current_user.email
+        text = request.json.get('content')
+        comment = Comment(text=text, author=author,
+                          parent_id= parent_comment.id,
+                          user_id=current_user.id, email=email, post_id=parent_comment.post_id)
+        comment.save()
+        db.session.commit()
+        query = Comment.query.filter(Comment.post_id == comment.post_id).order_by(Comment.thread_timestamp.desc(),
+                                                                                  Comment.path.asc())
+        return jsonify([i.to_dict() for i in query.all()])
+
 
 @bp.route('/comments', methods=['GET'])
 def get_post_comments():
-    page = request.args.get('page', 1, type=int)
     hash_id = request.args.get('post_id')
     post = Post.get_or_404(hash_id)
-    per_page = min(request.args.get('per_page', 10, type=int), 100)
     query = Comment.query.filter(Comment.post_id == post.id).order_by(Comment.thread_timestamp.desc(),
                                                                       Comment.path.asc())
-    data = Comment.to_collection_dict(query, page, per_page, 'api.get_post_comments', hash_id=hash_id)
-    return jsonify(data)
+    return jsonify([i.to_dict() for i in query.all()])
 
 
 @bp.route('/posts/draft', methods=['GET'])
