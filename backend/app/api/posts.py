@@ -125,7 +125,7 @@ def draft_post(hash_id):
 @token_auth.login_required
 def create_post():
     body = request.json.get('body')
-    title = request.json.get('title')
+    title = request.json.get('title') or 'Untitled story'
     post = Post(title=title, body=body)
     db.session.add(post)
     db.session.commit()
