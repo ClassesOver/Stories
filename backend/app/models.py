@@ -73,8 +73,8 @@ claps = db.Table(
 )
 tags = db.Table(
     'tags',
-    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id')),
-    db.Column('post_id', db.Integer, db.ForeignKey('post.id')),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id', ondelete='CASCADE')),
+    db.Column('post_id', db.Integer, db.ForeignKey('post.id', ondelete='CASCADE')),
 )
 
 

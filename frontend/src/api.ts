@@ -200,3 +200,15 @@ export const getComments = (data: { [key: string]: any }) => {
     const {id} = data;
     return get(`/api/comments?post_id=${id}`);
 }
+
+export const getTags = (postId: string) => {
+    return get(`/api/tags?post_id=${postId}`);
+}
+
+export const getOrCreateTag = (text: string, postId: string) => {
+    return post(`/api/tags`, {name: text, post_id: postId});
+}
+
+export const unlinkTag = (tagId: string, postId: string) => {
+    return put(`/api/tags`, {post_id: postId, tag_id: tagId});
+}

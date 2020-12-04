@@ -8613,6 +8613,14 @@ match-at@^0.1.1:
   resolved "https://registry.npm.taobao.org/match-at/download/match-at-0.1.1.tgz#25d040d291777704d5e6556bbb79230ec2de0540"
   integrity sha1-JdBA0pF3dwTV5lVru3kjDsLeBUA=
 
+material-ui-chip-input@^2.0.0-beta.2:
+  version "2.0.0-beta.2"
+  resolved "https://registry.npm.taobao.org/material-ui-chip-input/download/material-ui-chip-input-2.0.0-beta.2.tgz#d306ccd99d7c336a279add8163551fbc9dc2378c"
+  integrity sha1-0wbM2Z18M2onmt2BY1UfvJ3CN4w=
+  dependencies:
+    clsx "^1.0.4"
+    prop-types "^15.6.1"
+
 material-ui-popup-state@^1.7.0:
   version "1.7.0"
   resolved "https://registry.npm.taobao.org/material-ui-popup-state/download/material-ui-popup-state-1.7.0.tgz#914ed2b3cc7eec035bc1a4268c11c64022e57973"

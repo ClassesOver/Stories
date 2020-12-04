@@ -60,7 +60,6 @@ def create_post_comment():
                                                                                   Comment.path.asc())
         return jsonify([i.to_dict() for i in query.all()])
     if comment_hash_id:
-        print(request.json)
         parent_comment = Comment.get_or_404(comment_hash_id)
         author = current_user.username
         email = current_user.email
