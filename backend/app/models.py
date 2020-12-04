@@ -93,8 +93,6 @@ class Tag(db.Model):
     
     @classmethod
     def name_create(cls, name, user_id=None):
-        print(name)
-        print(user_id)
         if user_id:
             user_id = user_id
         else:
@@ -102,6 +100,13 @@ class Tag(db.Model):
                 user_id = current_user.id
         tag = Tag(name, user_id)
         db.session.add(tag)
+        return  tag
+    
+    def to_dict(self):
+        return  {
+            'id': self.hash_id,
+            'name': self.name
+        }
 
 class VerificationCode(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -355,6 +360,7 @@ class Post(SearchableMixin, db.Model):
             'clap_users_count': self.clap_users.count(),
             'published'       : self.published,
             'clap_count'      : self.clap_count or 0,
+            'tags'            : [tag.to_dict() for tag  in self.tags],
         }
         return data
     

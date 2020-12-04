@@ -71,6 +71,13 @@ const Post: React.FC<IPostProps> = (props) => {
              <span className='words'>{words} words</span>
          </h6>
          <MarkdownPreview className="markdown-body" value={readMore?  post.body: extraContent ? content + '...' : content}/> 
+         <div className='tags'>
+             {
+                 post.tags.map((v: {[key: string]: any, name: string, id: string}) => {
+                    return <span className="tag" data-id={v.id} >{v.name}</span>
+                 })
+             }
+         </div>
          {<a className="read-more-link" onClick={onReadMore}><span>{linkName}&nbsp;.&nbsp;{rt}</span></a>}
     </div>)
 }

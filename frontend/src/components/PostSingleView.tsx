@@ -32,6 +32,13 @@ const PostView: React.FC<IPostViewProps> = (props) => {
               <div className="tm-single-post">
                 <div className="tm-single-groud ">
                   <MarkdownPreview className="markdown-body" value={post.body} /> 
+                  <div className='tags'>
+                    {
+                      post.id ? post.tags.map((v: { [key: string]: any, name: string, id: string }) => {
+                        return <span className="tag" data-id={v.id} >{v.name}</span>
+                      }) : ''
+                    }
+                  </div>
                 </div>
                 <Comments postId={post.id} pageSize={10} />
                 <div className="actions">
