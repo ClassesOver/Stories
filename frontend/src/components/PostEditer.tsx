@@ -14,6 +14,7 @@ import { Icon } from "@material-ui/core";
 import Drawer from './Drawer';
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import ChipInput from 'material-ui-chip-input';
+import JsFileDownloader from 'js-file-downloader';
 
 interface IState {
     body: string;
@@ -163,9 +164,15 @@ const PostEditorHeader: React.FC<IPostEditorHeaderProps> = (props) => {
         props.onSave(event);
         setDrawerOpen(true);
     };
+    const onExport = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        let postId = props.postId;
+        api.getFile(`/api/posts/${props.postId}/export`);
+    };
     return (<div className="tm-post-editor-header">
         <PostSettingsDrawer post={props.postId} postId={props.postId} title='Settings' open={drawerOpen} toggleOpen={(open: boolean) => setDrawerOpen(open)} />
         <div id="title"><Markdown>{props.title || ''}</Markdown></div>
+        {props.mode == 'write' ? <Button variant="contained" color="primary" onClick={onExport} >Export</Button>: ''}
         {props.mode == 'write' ? props.published ? <Button variant="contained" color="primary" onClick={props.onDraft} >Draft</Button> : <Button variant="contained" color="primary" onClick={props.onPublish} >Publish</Button> : ''}
         <Button variant="contained" color="secondary" onClick={props.onSave} disabled={props.disabled} >Save</Button>
         <IconButton onClick={onClick} size='small'><Icon style={{ fontSize: '13px' }} className="fa fa-cog" /></IconButton>

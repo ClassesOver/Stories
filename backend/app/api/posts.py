@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import jsonify, request, abort
+from flask import jsonify, request, send_file
 from flask_login import current_user
 from app import db
 from app.models import Post, Comment
@@ -8,7 +8,11 @@ from app.api import bp
 from app.api.auth import token_auth
 from .errors import error_response
 from sqlalchemy import or_, desc
-
+from io import BytesIO
+from werkzeug.wsgi import wrap_file
+import werkzeug
+from werkzeug import urls
+import mimetypes
 
 @bp.route('/posts/search', methods=['GET'])
 def search_posts():
@@ -178,3 +182,28 @@ def post_clap(hash_id):
     db.session.commit()
     
     return jsonify({'clap_count': post.clap_count})
+
+@bp.route('/posts/<hash_id>/export', methods=['GET'])
+@token_auth.login_required
+def export(hash_id):
+    post = Post.get_or_404(hash_id)
+    io = BytesIO()
+    body= post.body or  ''
+    bytes = body.encode('utf-8')
+    io.write(bytes)
+    io.seek(0)
+    size = len(bytes)
+    data = wrap_file(request.environ, io)
+    headers = []
+    fname = '%s.md' % post.title or 'story'
+    headers.append(('Cache-Control', 'max-age=%s' % (0)))
+    headers.append(('Content-Disposition', content_disposition(fname)))
+    headers.append(('Content-Length', str(size)))
+    headers.append(('Content-Type', mimetypes.guess_type(fname)))
+    response = werkzeug.wrappers.Response(data, headers=headers, direct_passthrough=False)
+    return response
+
+
+def content_disposition(filename):
+    escaped = urls.url_quote(filename, safe='')
+    return "attachment; filename=%s" % escaped

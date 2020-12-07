@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import { HTTP_STATUS_CODES } from './errors'
 import { Queue } from './utils';
 import { responseCall, responseCallError, requestCall } from "./blocking";
+import JsFileDownloader from 'js-file-downloader';
 
 export const queue = new Queue();
 
@@ -98,8 +99,8 @@ export const remove = (url: string) => {
         }).catch(error => {
             reject(error)
         })
-    }) 
-} 
+    })
+}
 
 export const logIn = (username: string, password: string) => {
     let data = { username, password };
@@ -111,9 +112,9 @@ export const getUserInfo = (accessToken: boolean = true) => {
     } else {
         return get('/api/user_info?no_access_token=1');
     }
-    
+
 }
-export const saveUser = (data: { [key: string]: any} = {}) => {
+export const saveUser = (data: { [key: string]: any } = {}) => {
     return put('/api/user_info', data);
 }
 
@@ -147,21 +148,21 @@ export const updateClaps = (postId: string, data: { [key: string]: any } = {}) =
     return put(`/api/posts/${postId}/clap`, data)
 }
 
-export const getDraftPosts= (data: { [key: string]: any }) => {
-    const {page, pageSize: per_page } = data;
+export const getDraftPosts = (data: { [key: string]: any }) => {
+    const { page, pageSize: per_page } = data;
     return get(`/api/posts/draft?page=${page}&per_page=${per_page}`);
 }
 
 export const getPushlishedPosts = (data: { [key: string]: any }) => {
-    const {page, pageSize: per_page } = data;
+    const { page, pageSize: per_page } = data;
     return get(`/api/posts/published?page=${page}&per_page=${per_page}`);
 }
 
-export const removePost = (postId:  string) => {
-    return  remove(`/api/posts/${postId}`);
+export const removePost = (postId: string) => {
+    return remove(`/api/posts/${postId}`);
 }
 
-export const searchPost = (data: {[key: string]: any}) => {
+export const searchPost = (data: { [key: string]: any }) => {
     return get(`/api/posts/search?value=${data.value}&page=${data.page}&per_page${data.per_page}`);
 }
 
@@ -180,11 +181,11 @@ export const logOut = () => {
     });
 }
 
-export const sendVerificationCode = (data: { [key: string]: any}) => {
+export const sendVerificationCode = (data: { [key: string]: any }) => {
     return post('/api/verification_code', data);
 }
 
-export const signUp = (data: { [key: string]: any}) => {
+export const signUp = (data: { [key: string]: any }) => {
     return post('/api/signup', data);
 }
 
@@ -192,12 +193,12 @@ export const getTrendingStories = () => {
     return get('/api/posts/trending');
 }
 
-export const postComment = (data: { [key: string]: any}) => {
+export const postComment = (data: { [key: string]: any }) => {
     return post('/api/comments', data);
 };
 
 export const getComments = (data: { [key: string]: any }) => {
-    const {id} = data;
+    const { id } = data;
     return get(`/api/comments?post_id=${id}`);
 }
 
@@ -206,9 +207,20 @@ export const getTags = (postId: string) => {
 }
 
 export const getOrCreateTag = (text: string, postId: string) => {
-    return post(`/api/tags`, {name: text, post_id: postId});
+    return post(`/api/tags`, { name: text, post_id: postId });
 }
 
 export const unlinkTag = (tagId: string, postId: string) => {
-    return put(`/api/tags`, {post_id: postId, tag_id: tagId});
+    return put(`/api/tags`, { post_id: postId, tag_id: tagId });
+}
+
+export const getFile = (url: string) => {
+    let token = getCookie('access_token');
+    return new JsFileDownloader({
+        url,
+        headers: [
+            { name: 'Authorization', value: `Bearer ${token}` }
+        ]
+    })
+
 }

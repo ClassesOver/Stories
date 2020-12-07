@@ -7916,6 +7916,11 @@ js-cookie@^2.2.1:
   resolved "https://registry.npm.taobao.org/js-cookie/download/js-cookie-2.2.1.tgz#69e106dc5d5806894562902aa5baec3744e9b2b8"
   integrity sha1-aeEG3F1YBolFYpAqpbrsN0Tpsrg=
 
+js-file-downloader@^1.1.15:
+  version "1.1.15"
+  resolved "https://registry.npm.taobao.org/js-file-downloader/download/js-file-downloader-1.1.15.tgz#c095084f223fe8ab85b5ae6f8df4e0e5b97acfb1"
+  integrity sha1-wJUITyI/6KuFta5vjfTg5bl6z7E=
+
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npm.taobao.org/js-tokens/download/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
