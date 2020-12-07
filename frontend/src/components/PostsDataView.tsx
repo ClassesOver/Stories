@@ -5,6 +5,7 @@ import { Icon, IconButton, MenuItem, Menu } from '@material-ui/core';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import {useHistory} from 'react-router-dom';
 import * as  api from "../api";
+import PerfectScrollbar from 'react-perfect-scrollbar';
 
 interface IDataGridProps {
     fetch: (data: { [key: string]: any }) => Promise<any>;
@@ -63,7 +64,8 @@ export default (props: IDataGridProps) => {
                     <IconButton onClick={onNextPage} disabled={links.next == null}  size="small" className="tm-dv-next" ><Icon className="fa fa-angle-right" /></IconButton>
                 </div>
             </div>
-            {loading ? <div className="tm-dv-loading"><span className="fa fa-circle-o-notch fa-spin fa-2x fa-fw"></span></div> : rows.map((row, index) => {
+            <PerfectScrollbar className="tm-dv-rows">
+                {loading ? <div className="tm-dv-loading"><span className="fa fa-circle-o-notch fa-spin fa-2x fa-fw"></span></div> : rows.map((row, index) => {
                 return <div className="tm-dv-row" key={row.id} data-id={row.id}>
                     <div className="tm-dv-title"><Link to={`/expore/view/${row.id}`}>{row.title}</Link></div>
                     <div className="tm-dv-fn">
@@ -84,6 +86,7 @@ export default (props: IDataGridProps) => {
                     </div>
                 </div>
             })}
+            </PerfectScrollbar>
         </div>
     );
 }

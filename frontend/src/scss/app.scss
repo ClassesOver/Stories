@@ -505,8 +505,7 @@ button {
   min-height: 400px;
 }
 .tm-tabpanel {
-  overflow: auto;
-  height: 400px;
+  height: 100%;
 }
 
 .tm-signin-actions , .tm-signup-actions{
@@ -582,7 +581,7 @@ button {
         color: #6b5a5a;
     }
     .open {
-        heigth: auto;
+        height: auto;
         opacity: 1;
     }
     .close {
@@ -635,4 +634,8 @@ button {
     background: #967a7a;
     margin: 0px 4px;
   }
+}
+
+.tm-dv-rows {
+  height: 100%;
 }
