@@ -1,14 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import {useRouteMatch, useLocation} from 'react-router-dom';
+import {useHistory, useLocation} from 'react-router-dom';
 import MarkdownPreview from './MarkdownPreview';
 import Moment from 'react-moment';
 import * as api from '../api';
+import Avatar from '@material-ui/core/Avatar';
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import PerfectScrollbar from 'react-perfect-scrollbar';
 interface ISearchViewProps {
 
 };
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      width: '30px',
+      height: '30px',
+      marginRight: '5px'
+    },
+  }),
+);
+
 
 const SearchView: React.FC<ISearchViewProps> = (props) => {
     const {search} = useLocation();
+    const classes = useStyles();
+    const history = useHistory();
     let params = new URLSearchParams(search);
     let value = params.get('value');
     let [page, setPage] = useState(1);
@@ -26,27 +41,34 @@ const SearchView: React.FC<ISearchViewProps> = (props) => {
      useEffect(() => {
         fetch();
     }, [search]);
-    return <div className="tm-search-view">
-        {
-            items.map((item) => {
-                let content = '';
-                let extra = false;
-                if (item.body && item.body.length > 200) {
-                    content = item.body.slice(0, 200);
-                    extra = true;
-                } else {
-                    content = item.body;
+    const handleViewPost = (event: React.MouseEvent<HTMLElement>) => {
+        let target = event.target as HTMLElement;
+        history.push(`/expore/view/${target.dataset.id}`, {});
+    }
+    return (<div className="tm-search-view">
+        <PerfectScrollbar>
+            <div className="tm-posts">
+                {
+                    items.map((item) => {
+                        let content = '';
+                        let extra = false;
+                        if (item.body && item.body.length > 200) {
+                            content = item.body.slice(0, 200);
+                            extra = true;
+                        } else {
+                            content = item.body;
+                        }
+                        return (<div key={item.id} onClick={handleViewPost}  data-id={item.id} className="tm-search-piece tm-post-piece">
+                            <h6 data-id={item.id} ><Avatar src={item.author._links.avatar} className={classes.root} alt={item.author.username}>{item.author.username && item.author.username[0]}
+                            </Avatar><Moment format="LL" >{item.timestamp}</Moment></h6>
+                            <MarkdownPreview className="markdown-body" value={extra ? content + '...' : content} />
+                        </div>)
+                    })
                 }
-                return <div key={item.id} className="tm-search-view-item">
-                    <div>
-                        <h3>{item.title}</h3>
-                        <MarkdownPreview className="markdown-body" value={extra ? content + '...' : content} />
-                        <Moment format="LL" >{item.timestamp}</Moment>
-                    </div>
-                </div>
-            })
-        }
-    </div>
+            </div>
+        </PerfectScrollbar>
+    </div>)
+
 }
 
 export default SearchView;

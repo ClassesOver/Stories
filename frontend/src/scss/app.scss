@@ -219,7 +219,6 @@ $primary-color: #612c2c;
     text-shadow: 1px 1px 2px $text-shadow;
   }
   .tm-post-piece {
-    cursor: pointer;
     text-shadow: 1px 1px 2px $text-shadow;
     h6 {
       cursor: pointer;
@@ -531,6 +530,9 @@ button {
     transition: all 0.3s ease;
     justify-content: space-around;
     flex-flow: column;
+}
+.tm-search-view {
+  padding: 10px 10%;
 }
 
 .tm-expore {

@@ -74,7 +74,7 @@ const Post: React.FC<IPostProps> = (props) => {
          <div className='tags'>
              {
                  post.tags.map((v: {[key: string]: any, name: string, id: string}) => {
-                    return <span className="tag" data-id={v.id} >{v.name}</span>
+                    return <span key={v.id} className="tag" data-id={v.id} >{v.name}</span>
                  })
              }
          </div>

@@ -7,10 +7,9 @@ interface Props {
 
 const Search: React.FC<Props> = (props) => {
     const history = useHistory();
-    const {search} = useLocation();
+    const {search, pathname} = useLocation();
     let params = new URLSearchParams(search);
     let searchValue = params.get('value');
-    console.log(searchValue);
     const [value, setValue] = useState(searchValue);
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.value;
@@ -23,8 +22,13 @@ const Search: React.FC<Props> = (props) => {
         history.push(`/expore/search?value=${value}`);
     };
     useEffect(() => {
-        setValue(searchValue);
-    });
+
+        if (pathname !== '/expore/search') {
+            setValue('');
+        } else {
+            setValue(searchValue);
+        }
+    }, [pathname]);
     return  (<div className={`search-box-container ${props.className}`}>
     <div className="search-box">
         <a href="#" className="search-btn">
