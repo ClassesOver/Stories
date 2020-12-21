@@ -541,11 +541,46 @@ button {
     }
     .tm-posts-trending {
         .tm-post-trending {
+            .index {
+              font-family: sohne, "Helvetica Neue", Helvetica, Arial, sans-serif;
+              color: #e0dddd;
+              font-weight: bold;
+              font-size: 14px;
+              line-height: 36px;
+            }
+            .v {
+              padding: 0px 5px;
+              display: flex;
+              flex-direction: column;
+            }
+            .title {
+              padding: 0px 10px;
+              max-height: 40px;
+              font-weight: 700;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              color: rgba(41, 41, 41, 1);
+              font-family: sohne, "Helvetica Neue", Helvetica, Arial, sans-serif;
+              line-height: 20px;
+              font-size: 16px;
+            }
+            .username {
+              text-transform: capitalize;
+              font-weight: bold;
+              font-size: 12px;
+            }
+            .mt {
+              font-size: 8px;
+              padding: 0px 10px;
+            }
+            .h {
+              display: flex;
+              align-items: center;
+            }
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             padding: 5px;
             margin: 0px 15px;
-            border-bottom: 0.5px dashed #e2e0e0;
             color: #6b6862;
             cursor: pointer;
         }

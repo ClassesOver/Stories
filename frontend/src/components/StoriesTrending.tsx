@@ -3,7 +3,7 @@ import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { Avatar } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import * as api from '../api';
-import { height } from '@material-ui/system';
+import Moment from 'react-moment';
 
 
 interface IStoriesTrendingProps {
@@ -11,6 +11,7 @@ interface IStoriesTrendingProps {
 interface IStory {
     value: {[key: string]: any};
     id: any;
+    index: number;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -33,9 +34,20 @@ function _Story (props: IStory) {
         history.push(`/expore/view/${id}`);
     }
     return <div onClick={onClick} className="tm-post-trending" data-id={id}>
-         <Avatar src={value.author._links.avatar} className={classes.root} alt={value.author.username}>{value.author.username && value.author.username[0]}
-             </Avatar>
-        <span>{value.title}</span>
+        <span className='index'>{`0${props.index + 1}`}</span>
+        <div className="v">
+            <div className="h">
+                <Avatar src={value.author._links.avatar} className={classes.root} alt={value.author.username}>{value.author.username && value.author.username[0]}
+                </Avatar>
+                <span className="username">{value.author.username}</span>
+            </div>
+            <div className="h">
+                <span className="title">{value.title}</span>
+            </div>
+            <div className="mt">
+                <Moment format="LL" >{value.timestamp}</Moment>
+            </div>
+        </div>
     </div>
 }
 
@@ -60,8 +72,8 @@ function StoriesTrending(props: IStoriesTrendingProps) {
     return <div className="tm-posts-trending">
             <h4>Trending Stories</h4>
            {
-            stories.map((story: { [x: string]: any; id: any; }) => {
-                return <_Story key={story.id} id={story.id} value={story} />
+            stories.map((story: { [x: string]: any; id: any; }, index: number) => {
+                return <_Story key={story.id} index={index} id={story.id} value={story} />
             })
         }
     </div>

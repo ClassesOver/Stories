@@ -175,7 +175,7 @@ const Comments: React.FC<ICommentsProps> = (props) => {
         setOpen(false);
     }
     return <div className="tm-comments">
-        <div className="tm-comments-count">{`(6) Comments`}</div>
+        <div className="tm-comments-count">{`(${comments.length}) Comments`}</div>
         <div className={classes.commentActions}>
             {open ? <React.Fragment>
                 <Button size="small" onClick={onPostComment} variant="outlined" >Post a Comment</Button>
