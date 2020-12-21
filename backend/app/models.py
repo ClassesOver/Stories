@@ -428,7 +428,7 @@ class Comment(db.Model):
     replies = db.relationship(
         'Comment', backref=db.backref('parent', remote_side=[id]),
         lazy='dynamic')
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id', ondelete='CASCADE'))
     
     def reply(self, text):
         return Comment(text=text, parent = self)
