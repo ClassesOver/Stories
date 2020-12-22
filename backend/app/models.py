@@ -378,6 +378,7 @@ class Message(db.Model):
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     body = db.Column(db.String(140))
+    unread = db.Column(db.Boolean(), default=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     
     def __repr__(self):
@@ -389,11 +390,11 @@ class Notification(db.Model):
     name = db.Column(db.String(128), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     timestamp = db.Column(db.Float, index=True, default=time)
-    payload_json = db.Column(db.Text)
+    unread = db.Column(db.Boolean(), default=True)
+    body = db.Column(db.String(140))
     
-    def get_data(self):
-        return json.loads(str(self.payload_json))
-
+    def __repr__(self):
+        return '<Message {}>'.format(self.name)
 
 class Task(db.Model):
     id = db.Column(db.String(36), primary_key=True)

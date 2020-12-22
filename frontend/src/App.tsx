@@ -9,6 +9,7 @@ import BlockUi from 'react-block-ui';
 import 'react-block-ui/style.css';
 import 'animate.css';
 import { ThemeProvider } from '@material-ui/styles';
+import socketio from 'socket.io-client';
 import { setBlockUiCallback } from "./blocking";
 import {
     HashRouter as Router,
@@ -30,10 +31,12 @@ const theme = createMuiTheme({
     },
 });
 let errorMessageWorker: any = null;
+let ENDPOINT: any = `http://${document.domain}`
 function App() {
     const [authenticated, setAuthenticated] = useState<IState>({ initUser: false, userId: false, accessToken: false, userInfo: { id: false } });
     const [userLoaded, setUserLoaded] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [socket, setSocket] = useState<socketio.Socket>();
     const [block, setBlock] = useState(false);
     const getUser = async () => {
         getUserInfo().then((value) => {
@@ -63,11 +66,16 @@ function App() {
         if (authenticated.initUser) {
             setUserLoaded(true);
         }
+        if (!!authenticated.userId) {
+            let _socket = socketio.io();
+            setSocket(_socket);
+        }
     }, [authenticated]);
     let state = {
         authenticated,
         setAuthenticated,
         isAuthenticated,
+        socket,
         block,
         setBlock,
     }
