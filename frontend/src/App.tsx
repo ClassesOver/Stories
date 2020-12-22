@@ -31,7 +31,8 @@ const theme = createMuiTheme({
     },
 });
 let errorMessageWorker: any = null;
-let ENDPOINT: any = `http://${document.domain}`
+let ENDPOINT: any = `http://${document.domain}`;
+let interval: any;
 function App() {
     const [authenticated, setAuthenticated] = useState<IState>({ initUser: false, userId: false, accessToken: false, userInfo: { id: false } });
     const [userLoaded, setUserLoaded] = useState(false);
@@ -61,13 +62,20 @@ function App() {
             setBlock(value);
         };
         setBlockUiCallback(cb);
-    }, [])
+    }, []);
     useEffect(() => {
         if (authenticated.initUser) {
             setUserLoaded(true);
         }
+        if  (interval) {
+            clearInterval(interval);
+        }
         if (!!authenticated.userId) {
-            let _socket = socketio.io();
+            let _socket = socketio.io({transports:['websocket', 'polling'],});
+            interval = setInterval(() => {
+                _socket.emit('messages_unread_count', {});
+                _socket.emit('notification_count', {});
+            }, 1500);
             setSocket(_socket);
         }
     }, [authenticated]);

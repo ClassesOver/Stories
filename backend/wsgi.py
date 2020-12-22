@@ -6,7 +6,7 @@ from flask import g, request
 
 app = create_app()
 cli.register(app)
-socketio = SocketIO(app, logger=True, engineio_logger=True, manage_session=False)
+socketio = SocketIO(app, logger=True, engineio_logger=True)
 
 
 def authenticated_only(f):
@@ -45,4 +45,4 @@ def make_shell_context():
 
 
 if __name__ == '__main__':
-    app.run()
+    socketio.run(app)

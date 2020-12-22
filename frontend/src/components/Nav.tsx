@@ -28,33 +28,18 @@ export default () => {
   const [greeting, setGreeting] = useState('');
   const [msgCount, setMsgCount] = useState(0)
   const [notificationCount, setNotificationCount] = useState(0)
-  let interval: any;
   useEffect(() => {
       if (socket) {
-        socket.on('connect', () => {
-            interval = setInterval(() => {
-                socket.emit('messages_unread_count', {});
-                socket.emit('notification_count', {});
-            }, 1500);
-            socket.on('messages_unread_count', (data: {[key:string]: any}) => {
-                setMsgCount(data.count);
-            });
-            socket.on('notification_count', (data: {[key:string]: any}) => {
-                setNotificationCount(data.count);
-            })
+        socket.off('messages_unread_count');
+        socket.on('messages_unread_count', (data: {[key:string]: any}) => {
+            setMsgCount(data.count);
         });
-        socket.on('disconnect', () => {
-            if (interval) {
-                clearInterval(interval)
-            }
+        socket.off('notification_count');
+        socket.on('notification_count', (data: {[key:string]: any}) => {
+            setNotificationCount(data.count);
         })
       }
-      return () => {
-          if (interval) {
-              clearInterval(interval)
-          }
-      }
-  }, [])
+  }, [socket])
   const sayGreeting = () => {
       let now = new Date();
       let  hour = now.getHours();
@@ -92,7 +77,7 @@ export default () => {
             <Search className="tm-search" placeholder="Search" />
             <AuthButton />
             <SignupButton />
-            <div>
+            {isAuthenticated() ? (<div>
                 <IconButton >
                     <Badge badgeContent={notificationCount} max={99} color="secondary" invisible={notificationCount <= 0}>
                         <NotificationsIcon />
@@ -104,7 +89,7 @@ export default () => {
                         <MailIcon />
                     </Badge>
                 </IconButton>
-            </div>
+            </div>) : ''}
         </Navbar.Collapse>
     </Navbar>
 }
