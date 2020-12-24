@@ -14,7 +14,6 @@ import { Icon } from "@material-ui/core";
 import Drawer from './Drawer';
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import ChipInput from 'material-ui-chip-input';
-import JsFileDownloader from 'js-file-downloader';
 
 interface IState {
     body: string;

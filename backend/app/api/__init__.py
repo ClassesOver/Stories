@@ -8,4 +8,4 @@ class MessageType(Enum):
     WARNING = 'warning'
     ERROR = 'error'
 
-from app.api import users, errors, tokens, posts, base, tags
+from app.api import users, errors, tokens, posts, base, tags, messages

@@ -379,10 +379,23 @@ class Message(db.Model):
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     body = db.Column(db.String(140))
     unread = db.Column(db.Boolean(), default=True)
+    mtype = db.Column(db.String(64), default="discuss")
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    
+
     def __repr__(self):
         return '<Message {}>'.format(self.body)
+
+    def to_dict(self):
+        data = {
+            'id'          : self.hash_id,
+            'sender_id'   : self.sender_id,
+            'recipient_id': self.recipient_id,
+            'body'        : self.body,
+            'mtype'       : self.mtype,
+            'unread'      : self.unread,
+            'timestamp'   : self.timestamp.isoformat() + 'Z'
+        }
+        return data
 
 
 class Notification(db.Model):
