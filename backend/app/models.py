@@ -467,8 +467,16 @@ class Comment(db.Model):
         db.session.commit()
         prefix = self.parent.path + '.' if self.parent else ''
         self.path = prefix + '{:0{}d}'.format(self.id, self._N)
+        user = User.query.get(self.user_id)
         if self.parent:
             self.thread_timestamp = self.parent.thread_timestamp
+            body = 'reply to %s: %s' % (self.parent.email or user.username, self.text)
+        else:
+            body = self.text
+        post = Post.query.get(self.post_id)
+        author_id = post.user_id
+        message = Message(body=body, sender_id = self.user_id, recipient_id= author_id)
+        db.session.add(message)
         db.session.commit()
 
     def level(self):
