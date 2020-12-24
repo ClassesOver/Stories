@@ -18,6 +18,7 @@ from config import Config
 from app.mixin import PaginatedAPIMixin
 hashids = Hashids(salt='hash my id', min_length=16)
 
+Models ={}
 
 class _Model(Model, PaginatedAPIMixin):
     

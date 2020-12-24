@@ -155,7 +155,7 @@ const MessagesDrawer: React.FC<IMessagesDrawerProps> = (props) => {
                                 </div>
                             </div>
                             <div className={classes.messageBody} style={{ maxHeight: '63px', overflow: 'hidden' }}>
-                                <p>{v.body}</p>
+                                <p>{v.res_record ? <Nav.Link as={Link} to={`/expore/view/${v.res_record.id}`}  >{v.body}</Nav.Link> : v.body}</p>
                             </div>
                         </li>
                     })}

@@ -14,6 +14,22 @@ from app import db, login
 from app.search import add_to_index, remove_from_index, query_index
 from flask_login import current_user
 import random
+from werkzeug.local import LocalProxy
+
+
+class _Map:
+    def __init__(self, o):
+        self.obj = o
+    
+    def __getitem__(self, item):
+        return getattr(self.obj, item, False)
+
+
+def _models():
+    from app import models
+    return _Map(models)
+
+registry = LocalProxy(_models)
 
 
 class SearchableMixin(object):
@@ -381,11 +397,18 @@ class Message(db.Model):
     unread = db.Column(db.Boolean(), default=True)
     mtype = db.Column(db.String(64), default="discuss")
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    res_id = db.Column(db.Integer())
+    res_model = db.Column(db.String(16))
 
     def __repr__(self):
         return '<Message {}>'.format(self.body)
 
     def to_dict(self):
+        record = None
+        if self.res_id and self.res_model:
+            Model = registry[self.res_model]
+            if Model:
+                record = Model.query.get(self.res_id).to_dict()
         data = {
             'id'          : self.hash_id,
             'sender_id'   : self.sender_id,
@@ -393,7 +416,10 @@ class Message(db.Model):
             'body'        : self.body,
             'mtype'       : self.mtype,
             'unread'      : self.unread,
-            'timestamp'   : self.timestamp.isoformat() + 'Z'
+            'timestamp'   : self.timestamp.isoformat() + 'Z',
+            'res_id'      : self.res_id,
+            'res_model'   : self.res_model,
+            'res_record'  : record,
         }
         return data
 
@@ -475,9 +501,10 @@ class Comment(db.Model):
             body = self.text
         post = Post.query.get(self.post_id)
         author_id = post.user_id
-        message = Message(body=body, sender_id = self.user_id, recipient_id= author_id)
+        message = Message(res_id=post.id, res_model="Post", body=body, sender_id=self.user_id, recipient_id=author_id)
         db.session.add(message)
         db.session.commit()
 
     def level(self):
         return len(self.path) // self._N - 1
+

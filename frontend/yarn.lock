@@ -11637,6 +11637,13 @@ react-bootstrap@^1.4.0:
     uncontrollable "^7.0.0"
     warning "^4.0.3"
 
+react-chat-ui@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.npm.taobao.org/react-chat-ui/download/react-chat-ui-0.4.0.tgz#4bdde4d7945ed3af04bd50e6c22b621fc246b7b5"
+  integrity sha1-S93k15Re068EvVDmwitiH8JGt7U=
+  dependencies:
+    prop-types "^15.5.10"
+
 react-code-blocks@^0.0.8:
   version "0.0.8"
   resolved "https://registry.npm.taobao.org/react-code-blocks/download/react-code-blocks-0.0.8.tgz#3bb70b9b60510dba6c6b7ef350d1977cf022ff15"
