@@ -2,7 +2,7 @@ from flask import Blueprint
 from enum import Enum
 bp = Blueprint('api', __name__)
 
-class MessageType(Enum):
+class MessageType:
     INFO = 'info'
     SUCCESS = 'success'
     WARNING = 'warning'

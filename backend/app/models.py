@@ -208,11 +208,17 @@ class User(UserMixin, db.Model):
     def follow(self, user):
         if not self.is_following(user):
             self.followed.append(user)
-    
+            msg = Message(mtype='follow & unfollow', sender_id=self.id, recipient_id=user.id,
+                          body="%s are following you." % self.username)
+            db.session.add(msg)
+
     def unfollow(self, user):
         if self.is_following(user):
             self.followed.remove(user)
-    
+            msg = Message(mtype='follow & unfollow', sender_id=self.id, recipient_id=user.id,
+                          body="%s are unfollowing you." % self.username)
+            db.session.add(msg)
+
     def is_following(self, user):
         return self.followed.filter(
             followers.c.followed_id == user.id).count() > 0
@@ -349,6 +355,11 @@ class Post(SearchableMixin, db.Model):
     def action_publish(self):
         self.published = True
         self.add_to_index()
+        author = User.query.get(self.user_id)
+        for f in author.followers.all():
+            msg = Message(mtype='Stories', sender_id=author.id, recipient_id=f.id,
+                    body="%s posted %s." % (author.username, self.title))
+            db.session.add(msg)
         
     
     def action_draft(self):

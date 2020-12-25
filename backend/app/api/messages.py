@@ -10,10 +10,14 @@ from app import db
 @bp.route('/messages', methods=['GET'])
 @token_auth.login_required
 def get_messages():
+    limit = int(request.args.get('limit')) or 100
+    offset = int(request.args.get('offset')) or 0
     query = Message.query.filter_by(recipient_id=current_user.id).order_by(Message.unread.desc(),
-                                                                           Message.timestamp.desc())
-
-    return jsonify([msg.to_dict() for msg in query.all()])
+                                                                           Message.timestamp.desc()).limit(
+        limit).offset(offset)
+    count = Message.query.filter_by(recipient_id=current_user.id).order_by(Message.unread.desc(),
+                                                                           Message.timestamp.desc()).count()
+    return jsonify({'messages': [msg.to_dict() for msg in query.all()], 'count': count})
 
 
 @bp.route('/messages/<hash_id>/mark_as_read', methods=['PUT'])

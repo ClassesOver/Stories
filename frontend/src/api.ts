@@ -224,14 +224,14 @@ export const getFile = (url: string) => {
     })
 
 }
-export const getMessages =  () => {
-    return get(`/api/messages`)
+export const getMessages =  (offset: number = 0, limit: number = 100) => {
+    return get(`/api/messages?offset=${offset}&limit=${limit}`);
 }
 
 export const markMessageAsRead = (id: string) => {
-    return put(`/api/messages/${id}/mark_as_read`, {})
+    return put(`/api/messages/${id}/mark_as_read`, {});
 }
 
 export const messageRemove= (id: string) => {
-    return remove(`/api/messages/${id}`)
+    return remove(`/api/messages/${id}`);
 }
