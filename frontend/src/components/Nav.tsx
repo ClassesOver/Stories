@@ -11,6 +11,8 @@ import Badge from '@material-ui/core/Badge';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MessageIcon from '@material-ui/icons/Message';
+import Button from '@material-ui/core/Button';
+import Icon from '@material-ui/core/Icon';
 import CloseIcon from '@material-ui/icons/Close';
 import { IconButton } from '@material-ui/core';
 import Drawer from './Drawer';
@@ -32,6 +34,8 @@ const useStyles = makeStyles((theme: Theme) =>
             },
         },
         messagesDrawer: {
+            overflow: 'auto',
+            paddingBottom: '60px',
             width: '32vw',
             minWidth: '320px',
             display: 'flex',
@@ -87,24 +91,66 @@ const useStyles = makeStyles((theme: Theme) =>
             '& > div': {
                 width: '100%',
             }
-        }
+        },
+        loading: {
+            display: 'flex',
+            justifyContent: 'center',
+        },
+        moreMessage: {
+            position: 'absolute',
+            height: '50px',
+            left: '50%',
+            bottom: '0px',
+            display: 'flex',
+            transform: 'translateX(-50%)',
+            justifyContent: 'center',
+            '& >  button': {
+                textTransform: 'none',
+                width: '100%'
+            }
+        },
     }),
 );
 
 const MessagesDrawer: React.FC<IMessagesDrawerProps> = (props) => {
     const classes = useStyles();
-    const [messages, setMessages] = useState<{[key: string]: any} []>();
-    const fetchMessages = async () => {
-        let resp = await api.getMessages();
-        let messages = resp.data;
+    const [messages, setMessages] = useState<{[key: string]: any} []>([]);
+    const [offset, setOffset] = useState(0);
+    const [count, setCount] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const fetchMessages = async (offset: number = 0, limit: number=100) => {
+        setLoading(true);
+        let resp = await api.getMessages(offset, limit);
+        setLoading(false);
+        let msgs = resp.data.messages as {[key: string]: any} [];
+        let count = resp.data.count;
+        setCount(count);
+        if (offset === 0) {
+            setMessages(msgs);
+        } else {
+            setMessages(messages.concat(msgs));
+        }
         return messages;
     };
+    const onLoadMoreMessages = async (event: React.MouseEvent<HTMLButtonElement>) => {
+        setOffset(offset + 100);
+    }
+    useEffect(() => {
+        if (offset > 0) {
+            fetchMessages(offset)
+        }
+    }, [offset]);
     const onMarkAsRead = async (id: string, event: React.MouseEvent<HTMLButtonElement>) => {
         await api.markMessageAsRead(id);
         (async () => {
             if (props.open) {
-                let msgs = await fetchMessages();
-                setMessages(msgs);
+                let new_messages = messages.map((msg) => {
+                    if (msg.id === id) {
+                        return {...msg, unread: false}
+                    } 
+                    return {...msg};
+                });
+                setMessages(new_messages);
             } else {
                 setMessages([]);
             }
@@ -115,8 +161,10 @@ const MessagesDrawer: React.FC<IMessagesDrawerProps> = (props) => {
         await api.messageRemove(id);
         (async () => {
             if (props.open) {
-                let msgs = await fetchMessages();
-                setMessages(msgs);
+                let new_messages = messages.filter((msg) => {
+                    return msg.id !== id;
+                })
+                setMessages(new_messages);
             } else {
                 setMessages([]);
             }
@@ -126,8 +174,8 @@ const MessagesDrawer: React.FC<IMessagesDrawerProps> = (props) => {
     useEffect(() => {
         (async () => {
             if (props.open) {
-                let msgs = await fetchMessages();
-                setMessages(msgs);
+                setOffset(0);
+                await fetchMessages();
             } else {
                 setMessages([]);
             }
@@ -161,6 +209,12 @@ const MessagesDrawer: React.FC<IMessagesDrawerProps> = (props) => {
                     })}
                 </ul>
             </PerfectScrollbar>
+            <div className={classes.loading}>
+                {loading ? <Icon className="fa fa-spinner fa-pulse" /> : ''}
+            </div>
+            <div className={classes.moreMessage}>
+                {messages.length < count? <Button onClick={onLoadMoreMessages}>Load more messages</Button> : '' }
+            </div>
         </div>
     </Drawer>
 }

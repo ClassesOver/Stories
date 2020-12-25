@@ -13,14 +13,14 @@ def follow(hash_id):
     user = User.get(hash_id)
     if user is None:
         message = 'User not found.'
-        jsonify({'message': message, 'type': MessageType.ERROR})
+        jsonify({'message': message, 'mtype': MessageType.ERROR})
     if user == current_user:
         message = 'You cannot follow yourself!'
-        jsonify({'message': message, 'type': MessageType.WARNING})
+        jsonify({'message': message, 'mtype': MessageType.WARNING})
     message = 'You are following %s!' % user.username
     current_user.follow(user)
     db.session.commit()
-    return jsonify({'message': message, 'type': MessageType.SUCCESS})
+    return jsonify({'message': message, 'mtype': MessageType.SUCCESS})
 
 
 @bp.route('/users/<hash_id>/followed', methods=['PUT'])
@@ -29,14 +29,14 @@ def unfollow(hash_id):
     user = User.get(hash_id)
     if user is None:
         message = 'User not found.'
-        return  jsonify({'message': message, 'type': MessageType.ERROR})
+        return  jsonify({'message': message, 'mtype': MessageType.ERROR})
     if user == current_user:
         message = 'You cannot unfollow yourself!'
-        return  jsonify({'message': message, 'type': MessageType.WARNING})
-    message = 'You are following %s!' % user.username
-    current_user.follow(user)
+        return  jsonify({'message': message, 'mtype': MessageType.WARNING})
+    message = 'You are unfollowing %s!' % user.username
+    current_user.unfollow(user)
     db.session.commit()
-    return jsonify({'message': message, 'type': MessageType.SUCCESS})
+    return jsonify({'message': message, 'mtype': MessageType.SUCCESS})
 
 
 @bp.route('/users/<int:id>', methods=['GET'])
