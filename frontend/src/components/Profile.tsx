@@ -4,26 +4,32 @@ import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import {useToasts} from 'react-toast-notifications'
 import * as api from "../api";
 import AppContext from '../context';
+import ChatDialog from './Chat';
 const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    avatar: {
-      width: '120px',
-      height: '120px',
-    },
-    btn: {
-        textTransform: 'capitalize',
-    }
-  }),
+    createStyles({
+        avatar: {
+            width: '120px',
+            height: '120px',
+        },
+        btn: {
+            textTransform: 'capitalize',
+        },
+        sendMessage: {
+            padding: theme.spacing(1),
+        }
+    }),
 );
 interface IProfileProps {
     author: { [key: string]: any};
     isFollowing: boolean;
 }
 const Profile: React.FC<IProfileProps> =  (props) => {
-    const {authenticated} = useContext(AppContext);
+    const {authenticated, socket} = useContext(AppContext);
     const {author, isFollowing} = props;
     const [followed, setFollowed] = useState(isFollowing);
-    const { addToast } = useToasts()
+    const [open, setOpen] = useState(false);
+    const { addToast } = useToasts();
+    const [channelId, setChannelId] = useState('');
     const handleFollow = async (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
         let userId = author.id;
@@ -59,8 +65,18 @@ const Profile: React.FC<IProfileProps> =  (props) => {
             autoDismiss: true,
         })
     }
+    const onSendMessage = async (userId: string,event: React.MouseEvent<HTMLButtonElement>) => {
+        let resp = await api.inviteToJoinPrivate(userId);
+        let channel = resp.data;
+        if (channel.id) {
+            socket.emit('join_private', channel);
+            setChannelId(channel.id);
+            setOpen(true);
+        }
+    }
     const classes = useStyles();
     return <div className={'tm-profile'}>
+        <ChatDialog showChannels={false}defaultChatName={author.username} open={!!(open && channelId)} handleClose={() => setOpen(false) } defaultChatUserId={author.id} defaultChatChannelId={channelId} />
         <div className="base-container">
             {authenticated.userId !== author.id ? <div className="follow">
                 {followed ? <Button onClick={handleUnfollow} className={classes.btn}>Unfollow</Button>
@@ -84,6 +100,9 @@ const Profile: React.FC<IProfileProps> =  (props) => {
                 <Icon className="fa fa-github icon" style={{fontSize: 16}}/>
                 {author.github}
             </div>
+        </div>
+        <div className={classes.sendMessage}>
+            {author.id !== authenticated.userId ? <Button className={classes.btn} variant="outlined" color="primary" onClick={(event: React.MouseEvent<HTMLButtonElement>) => { onSendMessage(author.id, event) }}>Send Message</Button>: ''}
         </div>
     </div>
 }

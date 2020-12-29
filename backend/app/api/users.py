@@ -1,6 +1,6 @@
 from flask import jsonify, request, url_for, abort
 from app import db
-from app.models import User
+from app.models import User, Channel
 from app.api import bp
 from app.api.auth import token_auth
 from app.api.errors import bad_request
@@ -111,3 +111,35 @@ def update_user(id):
     user.from_dict(data, new_user=False)
     db.session.commit()
     return jsonify(user.to_dict())
+
+
+@bp.route('/users/private_channel/invite', methods=['GET'])
+@token_auth.login_required
+def private_channel_get():
+    user_hash_id = request.args.get('user_id')
+    other = User.get_or_404(user_hash_id)
+    if current_user.id != other.id:
+        channel = Channel.private_channel_get(current_user, other)
+        return jsonify(channel)
+    return jsonify({})
+
+
+@bp.route('/users/private_messages', methods=['GET'])
+@token_auth.login_required
+def private_messages_get():
+    channel_hash_id = request.args.get('channel_id')
+    channel = Channel.get(channel_hash_id)
+    return jsonify([msg.to_dict() for msg in channel.messages])
+
+@bp.route('/users/channels', methods=['GET'])
+@token_auth.login_required
+def get_channels():
+    channels = Channel.query.filter_by(ctype='private').filter(Channel.users.any(id=current_user.id)).all()
+    l = []
+    for channel in channels:
+        users = channel.users.filter(User.id != current_user.id).all()
+        if users:
+            user = users[0]
+            l.append({'user': user.to_dict(), 'channel': channel.to_dict()})
+    return jsonify(l)
+            

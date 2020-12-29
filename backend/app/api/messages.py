@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import jsonify, request, send_file
+from flask import jsonify
 from flask_login import current_user
 from app.models import Message
 from app.api import bp

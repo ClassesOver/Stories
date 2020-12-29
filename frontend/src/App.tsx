@@ -31,7 +31,10 @@ const theme = createMuiTheme({
     },
 });
 let errorMessageWorker: any = null;
-let ENDPOINT: any = `http://${document.domain}`;
+let TRANSPORTS = ['websocket', 'polling'];
+if (process.env.NODE_ENV == "development") {
+    TRANSPORTS = ['polling', 'websocket']
+}
 let interval: any;
 function App() {
     const [authenticated, setAuthenticated] = useState<IState>({ initUser: false, userId: false, accessToken: false, userInfo: { id: false } });
@@ -71,7 +74,7 @@ function App() {
             clearInterval(interval);
         }
         if (!!authenticated.userId) {
-            let _socket = socketio.io({transports:['websocket', 'polling'],});
+            let _socket = socketio.io({transports: TRANSPORTS,});
             interval = setInterval(() => {
                 _socket.emit('messages_unread_count', {});
                 _socket.emit('notification_count', {});
