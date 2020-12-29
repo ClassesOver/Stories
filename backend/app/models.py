@@ -398,18 +398,61 @@ class Post(SearchableMixin, db.Model):
             self.clap_users.append(user)
             db.session.add(self)
         return self.clap_count
+    
+channels = db.Table(
+    'channels',
+    db.Column('channel_id', db.Integer, db.ForeignKey('channel.id', ondelete='CASCADE')),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id',  ondelete='CASCADE'))
+)
 
+
+class Channel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    messages = db.relationship(
+        'Message', backref=db.backref('channel', remote_side=[id]),
+        lazy='dynamic')
+    ctype = db.Column(db.String(16), default='private')
+    users = db.relationship(
+        'User', secondary=channels,
+        backref=db.backref('channels', lazy='dynamic'), lazy='dynamic')
+    
+    def send_private_message(self, sender, recipient, content):
+        m = Message(sender_id=sender.id, recipient_id=recipient.id, mtype='private', body=content)
+        self.messages.append(m)
+        return m
+        
+    
+    @classmethod
+    def private_channel_get(cls, user, other):
+        channel = Channel.query.filter_by(ctype='private').filter(Channel.users.any(id=user.id)).filter(
+            Channel.users.any(id=other.id)).first()
+        if channel:
+            return channel.to_dict()
+        else:
+            channel = Channel()
+            channel.users.append(user)
+            channel.users.append(other)
+            db.session.add(channel)
+            db.session.commit()
+            return channel.to_dict()
+        
+    def to_dict(self):
+        return {
+            'id': self.hash_id,
+        }
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    body = db.Column(db.String(140))
+    body = db.Column(db.Text())
     unread = db.Column(db.Boolean(), default=True)
     mtype = db.Column(db.String(64), default="discuss")
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     res_id = db.Column(db.Integer())
     res_model = db.Column(db.String(16))
+    channel_id = db.Column(db.Integer, db.ForeignKey('channel.id'))
+    
 
     def __repr__(self):
         return '<Message {}>'.format(self.body)
@@ -423,7 +466,9 @@ class Message(db.Model):
         data = {
             'id'          : self.hash_id,
             'sender_id'   : self.sender_id,
+            'sender'      : self.sender_id and User.query.get(self.sender_id).to_dict(),
             'recipient_id': self.recipient_id,
+            'recipient'   : self.recipient_id and User.query.get(self.recipient_id).to_dict(),
             'body'        : self.body,
             'mtype'       : self.mtype,
             'unread'      : self.unread,

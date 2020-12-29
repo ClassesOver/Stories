@@ -224,7 +224,7 @@ export const getFile = (url: string) => {
     })
 
 }
-export const getMessages =  (offset: number = 0, limit: number = 100) => {
+export const getMessages = (offset: number = 0, limit: number = 100) => {
     return get(`/api/messages?offset=${offset}&limit=${limit}`);
 }
 
@@ -232,6 +232,21 @@ export const markMessageAsRead = (id: string) => {
     return put(`/api/messages/${id}/mark_as_read`, {});
 }
 
-export const messageRemove= (id: string) => {
-    return remove(`/api/messages/${id}`);
+export const messageRemove = (id: string) => {
+    return remove(`/api/messages/${id}`)
+}
+
+export const inviteToJoinPrivate = (userId: string) => {
+    return get(`/api/users/private_channel/invite?user_id=${userId}`)
+}
+
+export const sendPrivateMessage = (data: { [key: string]: any }) => {
+    return post(`/api/users/send_private_message`, data)
+}
+export const getPrivateMessage = (channelId: string) => {
+    return get(`/api/users/private_messages?channel_id=${channelId}`)
+}
+
+export const getChannels = () => {
+    return get(`/api/users/channels`)
 }
