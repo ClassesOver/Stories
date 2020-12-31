@@ -63,4 +63,49 @@ export const delayValue = (value:any, delay: number = 500) => {
 }
 
 
+export class Mutex {
+    private lock: any;
+    private queueSize: number;
+    private unlockedProm: any;
+    private _unlock: any;
+    constructor() {
+        this.lock = Promise.resolve();
+        this.queueSize = 0;
+        this.unlockedProm = undefined;
+        this._unlock = undefined;
+    }
+    exec(action: () =>void) {
+        let self = this;
+        let currentLock = this.lock;
+        let result: any;
+        this.queueSize++;
+        this.unlockedProm = this.unlockedProm || new Promise(function (resolve) {
+            self._unlock = resolve;
+        });
+        this.lock = new Promise<void>(function (unlockCurrent) {
+            currentLock.then(function () {
+                result = action();
+                var always = function (returnedResult: any) {
+                    unlockCurrent();
+                    self.queueSize--;
+                    if (self.queueSize === 0) {
+                        self.unlockedProm = undefined;
+                        self._unlock();
+                    }
+                    return returnedResult;
+                };
+                Promise.resolve(result).then(always);
+            });
+        });
+        return this.lock.then(function () {
+            return result;
+        });
+    }
+    getUnlockedDeffunction () {
+        return this.unlockedProm || Promise.resolve();
+    }
+};
+
+
+
 
