@@ -680,3 +680,23 @@ button {
 button:focus {
   outline: none;
 }
+.rce-container-citem {
+&.active {
+  .rce-citem  {
+    background-image: linear-gradient(to right,#612c2c, #e0a0a0);
+    color: white;
+  }
+  .rce-citem-body--bottom-title {
+    color: white;
+  }
+  .rce-citem-body--top-time {
+    color: white;
+  }
+}
+}
+.rce-container-mbox {
+  padding: 3px 0px;
+  .rce-mbox-text {
+    padding: 8px 0px;
+  } 
+}

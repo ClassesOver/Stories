@@ -9,11 +9,13 @@ import MuiDialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import SendIcon from '@material-ui/icons/Send';
 import * as api from '../api';
 import AppContext from '../context';
 import { v4 as uuidv4 } from 'uuid';
+import { ChatList, MessageList } from 'react-chat-elements';
+import 'react-chat-elements/dist/main.css';
+import {Mutex} from '../utils';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -24,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
         sendButton: {
             textTransform: 'capitalize',
             float: 'right',
-            margin: '5px 10px',
+            margin: '5px 10px 0px 10px',
         },
         avatar: {
             width: '30px',
@@ -43,65 +45,22 @@ const useStyles = makeStyles((theme: Theme) =>
             padding: '12px 0px',
             borderBottom: '1px solid #cecccc75',
         },
-        channelDescription: {
-            flex: 1,
-            padding: '0px 10px',
+        messageBoxPrefix: {
             fontSize: '13px',
-            textTransform: 'capitalize',
+            padding: '5px',
         },
-        lastMessage: {},
+        messageList: {
+            height: '100%',
+            overflowY: 'auto', 
+        },
         chatChannelName: {},
-        channels: {
-            color: '#808080',
-            margin: '0px',
-            padding: '0px',
-            listStyle: 'none',
+        sendContainer: {
+            boxShadow: '0 -1px 4px rgba(0, 21, 41, 0.08)',
+            padding: '15px',
         },
         main: {
             height: '320px',
         },
-        msgsContainer: {
-            minWidth: '520px',
-            overflow: 'hidden'
-        },
-        msgContainer: {
-            marginTop: '6px',
-            marginBottom: '6px',
-            marginLeft: '16px',
-            marginRight: '16px',
-            display: 'flex',
-            flexFlow: 'row nowrap',
-            alignItems: 'center',
-            '&.left': {
-                justifyContent: 'flex-start',
-                '& > .msg div.body': {
-                    background: '#dde1e4 !important',
-                },
-                '& > .msg > div.sender': {
-                    color: 'grey',
-                }
-            },
-            '&.right': {
-                justifyContent: 'flex-end',
-                '& > .msg > div.sender': {
-                    display: 'none',
-                }
-            }
-        },
-        msg: {
-            display: 'flex',
-            flexFlow: 'column',
-            '& > div.body': {
-                background: '#b0d6f7',
-                borderRadius: '3px',
-                padding: '6px',
-            },
-            '& > div.sender': {
-                fontSize: '12px',
-                marginBottom: '2px',
-            }
-
-        }
     }),
 );
 const styles = (theme: Theme) =>
@@ -121,6 +80,7 @@ const styles = (theme: Theme) =>
 
 export interface IChannelsProps {
     defaultChannelId?: string;
+    onItemClick: (value: any) => void;
 }
 
 export interface DialogTitleProps extends WithStyles<typeof styles> {
@@ -162,67 +122,62 @@ const DialogContent = withStyles((theme: Theme) => ({
 interface IMessagesProps {
     messages: { [key: string]: any };
 }
+interface IMessageProps {
+    value: string;
+}
+
 const Messages: React.FC<IMessagesProps> = (props) => {
     const classes = useStyles();
     const { authenticated } = useContext(AppContext);
-    return <div className={classes.msgsContainer} >
-        {props.messages.map((msg: any) => {
-            return <div key={msg.id} className={`${msg.sender.id === authenticated.userId ? 'right' : 'left'} ${classes.msgContainer}`}>
-                <div className={`${classes.msg} msg`}>
-                    <div className="sender">{msg.sender.username}</div>
-                    <div className="body">{msg.body}</div>
-                </div>
-            </div>
-        })}
-    </div>
-}
-const Channels: React.FC<IChannelsProps> = (props) => {
-    const classes = useStyles();
-    const [channels, setChannels] = useState<{ user: { [key: string]: any }, channel: { [key: string]: any } }[]>([]);
-    const [active, setActive] = useState(props.defaultChannelId || '');
-    const fetchChannels = async () => {
-        let resp = await api.getChannels();
-        return resp.data;
-    }
-    useEffect(() => {
-        (async () => {
-            let channels = await fetchChannels();
-            setChannels(channels);
-        })();
-    }, []);
-    return <ul className={classes.channels}>
-        {channels.map((v) => {
-            return <li className={`${v.channel.id === active ? classes.active : ''}`}>
-                <div className={`${classes.channel}`}>
-                    <Avatar className={classes.avatar} src={v.user._links.avatar} alt={v.user.username}>{v.user.username && v.user.username[0]}</Avatar>
-                    <div className={classes.channelDescription}>
-                        <span className={classes.chatChannelName}>{v.user.username}</span>
-                        <span className={classes.lastMessage}></span>
-                    </div>
-                </div>
-            </li>
-        })}
-    </ul>
+
+    return <MessageList
+        className={classes.messageList}
+        lockable={true}
+        toBottomHeight={'100%'}
+        dataSource={props.messages} />
 }
 
 export default function ChatDialog(props: ChatDialogProps) {
     const classes = useStyles();
+    const mutex = new Mutex();
     const [messages, setMessages] = useState<{ [key: string]: any }>([]);
     const [content, setContent] = useState('');
-    const { authenticated, socket } = useContext(AppContext);
     const [chatUserId, setChatUserId] = useState('');
     const [chatChannelId, setChatChannelId] = useState('');
+    const [newMessage, setNewMessage] = useState<any>();
+    const [messagesLoading, setMessagesLoading] = useState(false);
     const [chatName, setChatName] = useState('');
-    const [scrollEl, setScrollEl] = useState<any>();
+    const [channels, setChannels] = useState<{ [key: string]: any }[]>([]);
+    const {socket } = useContext(AppContext);
+    const fetchChannels = async () => {
+        let resp = await api.getChannels();
+        let dataSource = resp.data;
+        let newChannels = dataSource.map((v: { [key: string]: any }) => {
+            let className = "";
+            if (v.channel_id === chatChannelId) {
+                className = 'active'
+            }
+            return { ...v, date: new Date(v.date), className}
+        });
+        setChannels(newChannels);
+        return newChannels;
+    }
     useEffect(() => {
-        if (!scrollEl) {
-            return;
-        }
-        scrollEl.scrollTop = scrollEl.scrollHeigth;
-    }, [messages]);
+       fetchChannels();
+    }, [chatChannelId]);
     const fetchPrivateMessages = async (cid: string) => {
+        setMessagesLoading(true);
         let resp = await api.getPrivateMessage(cid);
-        return resp.data;
+        setMessagesLoading(false);
+        return resp.data.map((v: { [key: string]: any }) => {
+            return {
+                ...v,
+                notch: false,
+                replyButton: false,
+                date: new Date(v.date),
+            }
+        });
+        
     }
     useEffect(() => {
         (async () => {
@@ -231,30 +186,25 @@ export default function ChatDialog(props: ChatDialogProps) {
                 setMessages(msgs as []);
             }
         })()
-    }, [props]);
+    }, [props, chatChannelId]);
+    const pushNewMessage = function(value: any) {
+        setNewMessage(value);
+    }
+    useEffect(() => {
+        if (newMessage && newMessage.channel_id === chatChannelId) {
+            let values = messages.concat({...newMessage, date: new Date(newMessage.date)});
+            setMessages(values);          
+        }
+        fetchChannels();
+    }, [newMessage]);
     useEffect(() => {
         if (socket) {
-            socket.off('receive_private_message');
-            socket.on('receive_private_message', (data: string) => {
-                let newMsg = JSON.parse(data) as { [key: string]: any };
-                let update = false;
-                let newMessages = messages.map((v: { [key: string]: any }) => {
-                    if (v.newId && v.uuid === newMsg.uuid) {
-                        update = true;
-                        return { ...v, ...newMsg, uuid: false };
-                    } else {
-                        return { ...v }
-                    }
-                });
-                if (!update) {
-                    setMessages(newMessages.concat(newMsg));
-                } else {
-                    setMessages(newMessages)
-                }
-
-            });
-        };
-    }, [socket, messages]);
+            socket.off('new_private_message')
+            socket.on('new_private_message', (value: any) => {
+                pushNewMessage(value)
+            })
+        }
+    }, [socket]);
     useEffect(() => {
         setChatUserId(props.defaultChatUserId);
         setChatChannelId(props.defaultChatChannelId);
@@ -266,12 +216,28 @@ export default function ChatDialog(props: ChatDialogProps) {
     const onSend = async (event: React.MouseEvent<EventTarget>) => {
         if (chatUserId) {
             let newId = uuidv4();
-            let dummyMessage = { newId, body: content, sender: authenticated.userInfo };
-            socket.emit('send_private_message', { uuid: newId, content, user_id: chatUserId });
+            let dummyMessage = {uuid: newId, type: 'text', id: newId, text: content,notch: false, status: 'waiting', position: 'right', date: new Date(), };
             setContent('');
             let newMessages = messages.concat(dummyMessage);
             setMessages(newMessages);
+            let action = ((msgs: {[key: string]: any}[], newMsg: {[key: string]: any}) => {
+                return (async () => {
+                    let resp = await api.sendPrivateMessage({ uuid: newId, content, user_id: chatUserId });
+                    socket.emit('sent_private_message', resp.data)
+                    if (resp.data) {
+                        newMsg.status = 'sent'
+                        let newMsgs = msgs.concat(newMsg);
+                        setMessages(newMsgs);
+                    }
+                    return resp;
+                })
+            })([...messages as {[key: string]: any}[]], dummyMessage as {[key: string]: any});
+            mutex.exec(action);
         }
+    }
+    const onItemClick = (value: {[key: string]: any}) => {
+        setChatChannelId(value.channel_id);
+        setChatName(value.title);
     }
     return (
         <div>
@@ -282,18 +248,17 @@ export default function ChatDialog(props: ChatDialogProps) {
                 </DialogTitle>
                 <DialogContent>
                     {props.showChannels ? <div style={{ position: 'absolute', left: '0px', top: '0px', bottom: '0px', width: '256px', borderRight: '1px solid #f1efef' }}>
-                        <Channels defaultChannelId={props.defaultChatChannelId as string || ''} />
+                    <ChatList className='chat-list' dataSource={channels} onClick={onItemClick} />
                     </div> : ''}
                     <div style={{ position: 'absolute', left: `${props.showChannels ? '256px' : '0px'}`, top: '0px', bottom: '0px', right: '0px', display: 'flex', flexFlow: 'column' }}>
                         <div className={classes.main} style={{ flex: 1 }}>
-                            <PerfectScrollbar containerRef={ref => { setScrollEl(ref) }} >
-                                <Messages messages={messages} />
-                            </PerfectScrollbar>
+                            <Messages messages={messages} />
                         </div>
-                        <div>
+                        <div className={classes.sendContainer}>
                             <TextField
                                 margin="normal"
-                                variant="outlined" InputLabelProps={{
+                                placeholder="Type here..."
+                                InputLabelProps={{
                                     shrink: true,
                                 }} name="content" onChange={onContentChange} value={content} fullWidth multiline label="" />
 

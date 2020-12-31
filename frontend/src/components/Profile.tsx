@@ -69,14 +69,13 @@ const Profile: React.FC<IProfileProps> =  (props) => {
         let resp = await api.inviteToJoinPrivate(userId);
         let channel = resp.data;
         if (channel.id) {
-            socket.emit('join_private', channel);
             setChannelId(channel.id);
             setOpen(true);
         }
     }
     const classes = useStyles();
     return <div className={'tm-profile'}>
-        <ChatDialog showChannels={false}defaultChatName={author.username} open={!!(open && channelId)} handleClose={() => setOpen(false) } defaultChatUserId={author.id} defaultChatChannelId={channelId} />
+        <ChatDialog showChannels={true}defaultChatName={author.username} open={!!(open && channelId)} handleClose={() => setOpen(false) } defaultChatUserId={author.id} defaultChatChannelId={channelId} />
         <div className="base-container">
             {authenticated.userId !== author.id ? <div className="follow">
                 {followed ? <Button onClick={handleUnfollow} className={classes.btn}>Unfollow</Button>

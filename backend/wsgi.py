@@ -37,28 +37,28 @@ def messages_unread_count(data=[]):
 def messages_unread_count(data=[]):
     messages = Notification.query.filter_by(user_id=g.user.id).filter_by(unread=True).all()
     emit('notification_count', {'count': len(messages)})
+    
 
-
-@socketio.on('join_private')
+@socketio.on('sent_private_message')
 @authenticated_only
-def on_join_private(data):
-    channel = Channel.get(data['id'])
-    if channel:
-        join_room(channel.hash_id)
+def sent_private_message(data):
+    hash_id = data.get('id')
+    msg_obj = Message.get(hash_id)
+    recipient = User.query.get(msg_obj.recipient_id)
+    sender = User.query.get(msg_obj.sender_id)
+    msg = {
+        'position'    : 'left',
+        'date'        : msg_obj.timestamp.isoformat() + 'Z',
+        'status'      : 'received',
+        'text'        : msg_obj.body,
+        'type'        : 'text',
+        'id'          : msg_obj.hash_id,
+        'recipient_id': recipient.hash_id,
+        'sender_id'   : sender.hash_id,
+        'channel_id'  : msg_obj.channel.hash_id
+    }
+    emit('new_private_message', msg, broadcast=True)
 
-@socketio.on('send_private_message')
-@authenticated_only
-def send_private_message(data):
-    user_hash_id = data.get('user_id')
-    other = User.get_or_404(user_hash_id)
-    content = data.get('content', '')
-    if g.user.id != other.id:
-        channel_d = Channel.private_channel_get(g.user, other)
-        channel_obj = Channel.get(channel_d['id'])
-        msg_obj = channel_obj.send_private_message(g.user, other, content)
-        db.session.commit()
-        msg = json.dumps(msg_obj.to_dict())
-        emit('receive_private_message', msg, room=channel_obj.hash_id)
 
 @socketio.on('leave')
 @authenticated_only

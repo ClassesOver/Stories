@@ -1,10 +1,12 @@
 from flask import jsonify, request, url_for, abort
 from app import db
-from app.models import User, Channel
+from app.models import User, Channel, Message
 from app.api import bp
 from app.api.auth import token_auth
 from app.api.errors import bad_request
 from app.api import MessageType
+from flask_socketio import emit, join_room
+import json
 from flask_login import current_user
 
 @bp.route('/users/<hash_id>/followers', methods=['PUT'])
@@ -129,7 +131,32 @@ def private_channel_get():
 def private_messages_get():
     channel_hash_id = request.args.get('channel_id')
     channel = Channel.get(channel_hash_id)
-    return jsonify([msg.to_dict() for msg in channel.messages])
+    l = []
+    for msg in channel.messages:
+        if msg.sender_id == current_user.id:
+            if msg.unread:
+                status = 'sent'
+            else:
+                status = 'read'
+        else:
+            msg.unread = False
+            db.session.commit()
+            status = 'received'
+        recipient = User.query.get(msg.recipient_id)
+        sender = User.query.get(msg.sender_id)
+        d = {
+            'position'    : msg.sender_id == current_user.id and 'right' or 'left',
+            'date'        : msg.timestamp.isoformat() + 'Z',
+            'status'      : status,
+            'text'        : msg.body,
+            'type'        : 'text',
+            'id'          : msg.hash_id,
+            'recipient_id': recipient.hash_id,
+            'sender_id'   : sender.hash_id,
+            'channel_id'  : msg.channel.hash_id
+        }
+        l.append(d)
+    return jsonify(l)
 
 @bp.route('/users/channels', methods=['GET'])
 @token_auth.login_required
@@ -140,6 +167,41 @@ def get_channels():
         users = channel.users.filter(User.id != current_user.id).all()
         if users:
             user = users[0]
-            l.append({'user': user.to_dict(), 'channel': channel.to_dict()})
+            message = channel.messages.order_by(Message.timestamp.desc()).first()
+            unread = channel.messages.filter_by(unread=True).filter_by(recipient_id=current_user.id).count()
+            l.append({
+                      'avatar'    : user.avatar_src or user.avatar(128),
+                      'alt'       : user.username[0],
+                      'title'     : user.username,
+                      'subtitle'  : message and message.body,
+                      'date'      : message and message.timestamp.isoformat() + 'Z',
+                      'unread'    : unread,
+                      'user_id'   : user.hash_id,
+                      'channel_id': channel.hash_id})
     return jsonify(l)
-            
+@bp.route('/users/send_private_message', methods=['POST'])
+@token_auth.login_required
+def send_private_message():
+    user_hash_id = request.json.get('user_id')
+    uuid = request.json.get('uuid', '')
+    other = User.get_or_404(user_hash_id)
+    content = request.json.get('content', '')
+    if current_user.id != other.id:
+        channel_d = Channel.private_channel_get(current_user, other)
+        channel_obj = Channel.get(channel_d['id'])
+        msg_obj = channel_obj.send_private_message(current_user, other, content)
+        db.session.commit()
+        recipient = User.query.get(msg_obj.recipient_id)
+        sender = User.query.get(msg_obj.sender_id)
+        new_message = {
+            'position'    : msg_obj.sender_id == current_user.id and 'right' or 'left',
+            'date'        : msg_obj.timestamp.isoformat() + 'Z',
+            'text'        : msg_obj.body,
+            'type'        : 'text',
+            'id'          : msg_obj.hash_id,
+            'recipient_id': recipient.hash_id,
+            'sender_id'   : sender.hash_id,
+            'uuid'        : uuid,
+            'channel_id'  : msg_obj.channel.hash_id
+        }
+        return jsonify(new_message)
