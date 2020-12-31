@@ -122,13 +122,9 @@ const DialogContent = withStyles((theme: Theme) => ({
 interface IMessagesProps {
     messages: { [key: string]: any };
 }
-interface IMessageProps {
-    value: string;
-}
 
 const Messages: React.FC<IMessagesProps> = (props) => {
     const classes = useStyles();
-    const { authenticated } = useContext(AppContext);
 
     return <MessageList
         className={classes.messageList}
@@ -148,7 +144,7 @@ export default function ChatDialog(props: ChatDialogProps) {
     const [messagesLoading, setMessagesLoading] = useState(false);
     const [chatName, setChatName] = useState('');
     const [channels, setChannels] = useState<{ [key: string]: any }[]>([]);
-    const {socket } = useContext(AppContext);
+    const {socket, authenticated } = useContext(AppContext);
     const fetchChannels = async () => {
         let resp = await api.getChannels();
         let dataSource = resp.data;
@@ -191,8 +187,8 @@ export default function ChatDialog(props: ChatDialogProps) {
         setNewMessage(value);
     }
     useEffect(() => {
-        if (newMessage && newMessage.channel_id === chatChannelId) {
-            let values = messages.concat({...newMessage, date: new Date(newMessage.date)});
+        if (newMessage && newMessage.channel_id === chatChannelId && newMessage.sender_id !== authenticated.userId) {
+            let values = messages.concat({...newMessage, date: new Date(newMessage.date), notch: false, replyButton: false});
             setMessages(values);          
         }
         fetchChannels();
