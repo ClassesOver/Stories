@@ -17,7 +17,8 @@ def get_messages():
         limit).offset(offset)
     count = Message.query.filter_by(recipient_id=current_user.id).order_by(Message.unread.desc(),
                                                                            Message.timestamp.desc()).count()
-    return jsonify({'messages': [msg.to_dict() for msg in query.all()], 'count': count})
+    msgs = query.all() or []
+    return jsonify({'messages': [msg.to_dict() for msg in msgs], 'count': count})
 
 
 @bp.route('/messages/<hash_id>/mark_as_read', methods=['PUT'])
