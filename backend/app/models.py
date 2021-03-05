@@ -462,7 +462,7 @@ class Message(db.Model):
         if self.res_id and self.res_model:
             Model = registry[self.res_model]
             if Model:
-                record = Model.query.get(self.res_id).to_dict()
+                record = Model.query.get(self.res_id)
         data = {
             'id'          : self.hash_id,
             'sender_id'   : self.sender_id,
@@ -475,7 +475,7 @@ class Message(db.Model):
             'timestamp'   : self.timestamp.isoformat() + 'Z',
             'res_id'      : self.res_id,
             'res_model'   : self.res_model,
-            'res_record'  : record,
+            'res_record'  : record and record.to_dict(),
         }
         return data
 

@@ -255,7 +255,7 @@ $primary-color: #612c2c;
   position: fixed;
   left: 0px;
   top: 0px;
-  top: 103px;
+  top: 110px;
   bottom: 0px;
 }
 .tm-post-editor-header {
@@ -295,7 +295,7 @@ $primary-color: #612c2c;
   left: calc(100% - 50vw);
   right: 0;
   overflow: auto;
-  top: 103px;
+  top: 110px;
   background: hsla(0,0%,100%,.2);
   bottom: 0;
 }
@@ -558,13 +558,13 @@ button {
             .title {
               padding: 0px 10px;
               max-height: 40px;
-              font-weight: 700;
+              font-weight: 500;
               text-overflow: ellipsis;
               overflow: hidden;
               color: rgba(41, 41, 41, 1);
               font-family: sohne, "Helvetica Neue", Helvetica, Arial, sans-serif;
-              line-height: 20px;
-              font-size: 16px;
+              line-height: 26px;
+              font-size: 13px;
             }
             .username {
               text-transform: capitalize;
@@ -600,8 +600,8 @@ button {
         flex: 1 1;
         display: flex;
         flex-direction: column;
-        max-width: 250px;
-        max-height: 400px;
+        max-width: 320px;
+        max-height: 520px;
         border-radius: 3px;
         background: #f5f4f3fc;
         margin: 30px 10px;
