@@ -18,7 +18,7 @@ const renderers = {
     math: ({value}: any) => <BlockMath math={value} />,
     code: ({language, value}: any) => {
       return  <CodeBlock
-                text={value}
+                text={value || ''}
                 language={language}
                 showLineNumbers
                 wrapLines={false}
